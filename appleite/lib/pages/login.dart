@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'home.dart';
+import 'cadastro.dart'; // 👈 importa a página de cadastro
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,11 +13,8 @@ class _LoginPageState extends State<LoginPage> {
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
 
-  Future<void> _login() async {
+  void _login() {
     if (_emailCtrl.text == "admin" && _passCtrl.text == "123") {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool("loggedIn", true);
-      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomePage()),
@@ -48,6 +45,16 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(onPressed: _login, child: const Text("Entrar")),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const RegisterPage()),
+                );
+              },
+              child: const Text("Criar conta"),
+            ),
           ],
         ),
       ),

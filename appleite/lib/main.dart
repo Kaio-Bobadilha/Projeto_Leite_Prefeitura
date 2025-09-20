@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'pages/login.dart';
 import 'pages/home.dart';
-import 'pages/cadastro.dart';
 
 void main() {
   runApp(const MyApp());

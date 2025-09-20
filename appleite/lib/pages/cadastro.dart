@@ -11,6 +11,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final _cadProCtrl = TextEditingController();
 
   PessoaTipo _pessoa = PessoaTipo.fisica;
   String? _tipoUsuario;
@@ -44,6 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _municipioCtrl.dispose();
     _cepCtrl.dispose();
     _paisCtrl.dispose();
+    _cadProCtrl.dispose();
     super.dispose();
   }
 
@@ -65,9 +67,36 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
+      final dados = {
+        "pessoa": _pessoa.name,
+        "tipoUsuario": _tipoUsuario,
+        "cpfCnpj": _cpfCnpjCtrl.text.trim(),
+        "ie": _ieCtrl.text.trim(),
+        "dataNascimento": _pessoa == PessoaTipo.fisica
+            ? _dtNascCtrl.text
+            : null,
+        "inscricaoMunicipal": _imCtrl.text.trim(),
+        "cadPro": _cadProCtrl.text.trim(),
+        "razaoSocial": _razaoCtrl.text.trim(),
+        "nomeFantasia": _fantasiaCtrl.text.trim(),
+        "endereco": {
+          "logradouro": _logradouroCtrl.text.trim(),
+          "numero": _numeroCtrl.text.trim(),
+          "bairro": _bairroCtrl.text.trim(),
+          "municipio": _municipioCtrl.text.trim(),
+          "uf": _uf,
+          "cep": _cepCtrl.text.trim(),
+          "pais": _paisCtrl.text.trim(),
+        },
+      };
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Cadastro enviado com sucesso!')),
       );
+
+      debugPrint(
+        "SUBMIT: $dados",
+      ); // 👈 aqui você pode trocar pelo envio a uma API
     }
   }
 
@@ -143,7 +172,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                 // Tipo de usuário
                 DropdownButtonFormField<String>(
-                  value: _tipoUsuario,
+                  initialValue: _tipoUsuario,
                   items: tiposUsuario
                       .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                       .toList(),
@@ -268,7 +297,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _uf,
+                  initialValue: _uf,
                   items: ufs
                       .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                       .toList(),
@@ -296,6 +325,15 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                TextFormField(
+                  controller: _cadProCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'CAD PRO',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) => _validaObrigatorio(v, label: 'CAD PRO'),
+                ),
+                const SizedBox(height: 16),
 
                 ElevatedButton(
                   onPressed: _submit,

@@ -35,8 +35,7 @@ class CadastroMotorista extends Laticiniosvinculo {
   }
 
   @override
-  String toString(){
-    return 'CadastroMotorista'
+  String toString() {
+    return 'CadastroMotorista';
   }
-
 }

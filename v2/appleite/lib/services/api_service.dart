@@ -130,6 +130,57 @@ class ApiService {
     }
   }
 
+  // ==========================================================
+  // NOVOS MÉTODOS PARA REGISTRO DE COLETA
+  // ==========================================================
+
+  /// Registra uma nova coleta no backend.
+  Future<ApiResponse<Map<String, dynamic>>> registrarColeta(
+      Map<String, dynamic> dadosColeta) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/coletas'),
+        headers: _headers,
+        body: jsonEncode(dadosColeta),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        return ApiResponse.success(data);
+      } else {
+        return ApiResponse.error(
+            data['message'] ?? 'Falha ao registrar coleta');
+      }
+    } catch (e) {
+      return ApiResponse.error('Erro de conexão: $e');
+    }
+  }
+
+  /// Lista todas as coletas registradas.
+  Future<ApiResponse<List<dynamic>>> getColetas() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/coletas'),
+        headers: _headers,
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        return ApiResponse.success(data['data']);
+      } else {
+        return ApiResponse.error(data['message'] ?? 'Erro ao carregar coletas');
+      }
+    } catch (e) {
+      return ApiResponse.error('Erro de conexão: $e');
+    }
+  }
+
+  // ==========================================================
+  // FIM DOS NOVOS MÉTODOS
+  // ==========================================================
+
   // Obter histórico
   Future<ApiResponse<List<dynamic>>> getHistorico() async {
     try {

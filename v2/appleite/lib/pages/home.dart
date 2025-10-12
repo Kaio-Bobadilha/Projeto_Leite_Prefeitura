@@ -4,13 +4,15 @@ import 'usuarios.dart';
 import 'historico.dart';
 import 'relatorios.dart';
 import 'cadastro.dart';
-import 'comprovante_page.dart'; // <-- ADICIONADO IMPORT
+import 'comprovante_page.dart';
+import 'registro_coleta_page.dart'; // <-- 1. IMPORT ADICIONADO
 import '../services/api_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   Future<void> _logout(BuildContext context) async {
+    // Acessando o singleton da forma correta
     await ApiService().logout();
     if (context.mounted) {
       Navigator.pushReplacement(
@@ -22,6 +24,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Acessando o singleton da forma correta
     final user = ApiService().currentUser;
     final userName = user?['name'] ?? 'Usuário';
     final userType = user?['type'] ?? 'Desconhecido';
@@ -121,6 +124,19 @@ class HomePage extends StatelessWidget {
                       MaterialPageRoute(builder: (_) => const RegisterPage()),
                     ),
                   ),
+                  // BOTÃO ADICIONADO AQUI
+                  _buildMenuCard(
+                    context,
+                    'Registrar Coleta',
+                    'Lançar nova coleta de leite',
+                    Icons.add_location_alt,
+                    Colors.teal,
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const RegistroColetaPage()),
+                    ),
+                  ),
                   _buildMenuCard(
                     context,
                     'Histórico',
@@ -145,18 +161,6 @@ class HomePage extends StatelessWidget {
                   ),
                   _buildMenuCard(
                     context,
-                    'Perfil',
-                    'Ver informações do usuário',
-                    Icons.person,
-                    Colors.purple,
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const UserPage()),
-                    ),
-                  ),
-                  // NOVO BOTÃO ADICIONADO AQUI
-                  _buildMenuCard(
-                    context,
                     'Gerar Comprovante',
                     'Criar PDF de uma coleta',
                     Icons.receipt,
@@ -165,6 +169,17 @@ class HomePage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (_) => const ComprovantePage()),
+                    ),
+                  ),
+                  _buildMenuCard(
+                    context,
+                    'Perfil',
+                    'Ver informações do usuário',
+                    Icons.person,
+                    Colors.purple,
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const UserPage()),
                     ),
                   ),
                 ],

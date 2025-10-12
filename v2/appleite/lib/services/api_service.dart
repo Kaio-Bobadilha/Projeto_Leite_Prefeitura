@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:8080/api';
-  
+  static const String baseUrl = 'http://10.200.74.215:8080/api';
+
   // Singleton pattern
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
@@ -20,9 +20,9 @@ class ApiService {
 
   // Headers padrão
   Map<String, String> get _headers => {
-    'Content-Type': 'application/json',
-    if (_token != null) 'Authorization': 'Bearer $_token',
-  };
+        'Content-Type': 'application/json',
+        if (_token != null) 'Authorization': 'Bearer $_token',
+      };
 
   // Inicializar serviço (carregar token salvo)
   Future<void> initialize() async {
@@ -40,7 +40,7 @@ class ApiService {
     await prefs.setString('auth_token', token);
     await prefs.setString('current_user', jsonEncode(user));
     await prefs.setBool('loggedIn', true);
-    
+
     _token = token;
     _currentUser = user;
   }
@@ -51,13 +51,14 @@ class ApiService {
     await prefs.remove('auth_token');
     await prefs.remove('current_user');
     await prefs.setBool('loggedIn', false);
-    
+
     _token = null;
     _currentUser = null;
   }
 
   // Login
-  Future<ApiResponse<Map<String, dynamic>>> login(String username, String password) async {
+  Future<ApiResponse<Map<String, dynamic>>> login(
+      String username, String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/login'),
@@ -87,7 +88,8 @@ class ApiService {
   }
 
   // Cadastro
-  Future<ApiResponse<Map<String, dynamic>>> cadastro(Map<String, dynamic> dadosCadastro) async {
+  Future<ApiResponse<Map<String, dynamic>>> cadastro(
+      Map<String, dynamic> dadosCadastro) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/cadastro'),
@@ -120,7 +122,8 @@ class ApiService {
       if (response.statusCode == 200 && data['success'] == true) {
         return ApiResponse.success(data['data']);
       } else {
-        return ApiResponse.error(data['message'] ?? 'Erro ao carregar produtores');
+        return ApiResponse.error(
+            data['message'] ?? 'Erro ao carregar produtores');
       }
     } catch (e) {
       return ApiResponse.error('Erro de conexão: $e');
@@ -140,7 +143,8 @@ class ApiService {
       if (response.statusCode == 200 && data['success'] == true) {
         return ApiResponse.success(data['data']);
       } else {
-        return ApiResponse.error(data['message'] ?? 'Erro ao carregar histórico');
+        return ApiResponse.error(
+            data['message'] ?? 'Erro ao carregar histórico');
       }
     } catch (e) {
       return ApiResponse.error('Erro de conexão: $e');
@@ -160,7 +164,8 @@ class ApiService {
       if (response.statusCode == 200 && data['success'] == true) {
         return ApiResponse.success(data['data']);
       } else {
-        return ApiResponse.error(data['message'] ?? 'Erro ao carregar relatórios');
+        return ApiResponse.error(
+            data['message'] ?? 'Erro ao carregar relatórios');
       }
     } catch (e) {
       return ApiResponse.error('Erro de conexão: $e');
@@ -194,6 +199,10 @@ class ApiResponse<T> {
   final T? data;
   final String? error;
 
-  ApiResponse.success(this.data) : success = true, error = null;
-  ApiResponse.error(this.error) : success = false, data = null;
+  ApiResponse.success(this.data)
+      : success = true,
+        error = null;
+  ApiResponse.error(this.error)
+      : success = false,
+        data = null;
 }

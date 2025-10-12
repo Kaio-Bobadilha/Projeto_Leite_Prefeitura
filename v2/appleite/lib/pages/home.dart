@@ -4,6 +4,7 @@ import 'usuarios.dart';
 import 'historico.dart';
 import 'relatorios.dart';
 import 'cadastro.dart';
+import 'comprovante_page.dart'; // <-- ADICIONADO IMPORT
 import '../services/api_service.dart';
 
 class HomePage extends StatelessWidget {
@@ -67,15 +68,21 @@ class HomePage extends StatelessWidget {
                         children: [
                           Text(
                             'Bem-vindo, $userName!',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                           Text(
                             'Tipo: $userType',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey[600],
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Colors.grey[600],
+                                ),
                           ),
                         ],
                       ),
@@ -84,18 +91,18 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             Text(
               'Menu Principal',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Grid de opções
             Expanded(
               child: GridView.count(
@@ -145,6 +152,19 @@ class HomePage extends StatelessWidget {
                     () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const UserPage()),
+                    ),
+                  ),
+                  // NOVO BOTÃO ADICIONADO AQUI
+                  _buildMenuCard(
+                    context,
+                    'Gerar Comprovante',
+                    'Criar PDF de uma coleta',
+                    Icons.receipt,
+                    Colors.red,
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ComprovantePage()),
                     ),
                   ),
                 ],

@@ -4,12 +4,15 @@ import 'usuarios.dart';
 import 'historico.dart';
 import 'relatorios.dart';
 import 'cadastro.dart';
+import 'comprovante_page.dart';
+import 'registro_coleta_page.dart'; // <-- 1. IMPORT ADICIONADO
 import '../services/api_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   Future<void> _logout(BuildContext context) async {
+    // Acessando o singleton da forma correta
     await ApiService().logout();
     if (context.mounted) {
       Navigator.pushReplacement(
@@ -21,6 +24,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Acessando o singleton da forma correta
     final user = ApiService().currentUser;
     final userName = user?['name'] ?? 'Usuário';
     final userType = user?['type'] ?? 'Desconhecido';
@@ -67,15 +71,21 @@ class HomePage extends StatelessWidget {
                         children: [
                           Text(
                             'Bem-vindo, $userName!',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                           Text(
                             'Tipo: $userType',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey[600],
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Colors.grey[600],
+                                ),
                           ),
                         ],
                       ),
@@ -84,18 +94,18 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             Text(
               'Menu Principal',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Grid de opções
             Expanded(
               child: GridView.count(
@@ -112,6 +122,19 @@ class HomePage extends StatelessWidget {
                     () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const RegisterPage()),
+                    ),
+                  ),
+                  // BOTÃO ADICIONADO AQUI
+                  _buildMenuCard(
+                    context,
+                    'Registrar Coleta',
+                    'Lançar nova coleta de leite',
+                    Icons.add_location_alt,
+                    Colors.teal,
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const RegistroColetaPage()),
                     ),
                   ),
                   _buildMenuCard(
@@ -134,6 +157,18 @@ class HomePage extends StatelessWidget {
                     () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const RelatoriosPage()),
+                    ),
+                  ),
+                  _buildMenuCard(
+                    context,
+                    'Gerar Comprovante',
+                    'Criar PDF de uma coleta',
+                    Icons.receipt,
+                    Colors.red,
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ComprovantePage()),
                     ),
                   ),
                   _buildMenuCard(

@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\acer\OneDrive\Documentos\projetos_flutter\projeto_integrador\Projeto_Leite_Prefeitura\v2\appleite\windows\flutter\ephemeral\cpp_client_wrapper\core_implementations.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\acer\OneDrive\Documentos\projetos_flutter\projeto_integrador\Projeto_Leite_Prefeitura\v2\appleite\windows\flutter\ephemeral\cpp_client_wrapper\standard_codec.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\acer\OneDrive\Documentos\projetos_flutter\projeto_integrador\Projeto_Leite_Prefeitura\v2\appleite\windows\flutter\ephemeral\cpp_client_wrapper\plugin_registrar.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\acer\OneDrive\Documentos\projetos_flutter\projeto_integrador\Projeto_Leite_Prefeitura\v2\appleite\windows\flutter\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{D7E4E453-2487-3103-B4FA-AAC4B1796B6B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{68F00EDF-D876-3792-B40D-E8FAE4AD4E9B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

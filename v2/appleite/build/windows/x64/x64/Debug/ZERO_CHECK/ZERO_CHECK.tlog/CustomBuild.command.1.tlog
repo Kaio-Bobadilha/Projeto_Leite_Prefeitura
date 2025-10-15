@@ -1,0 +1,10 @@
+^C:\USERS\ACER\ONEDRIVE\DOCUMENTOS\PROJETOS_FLUTTER\PROJETO_INTEGRADOR\PROJETO_LEITE_PREFEITURA\V2\APPLEITE\BUILD\WINDOWS\X64\CMAKEFILES\2E78FD0DBA51C5E9C6FD51003B5DCCE7\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/windows -BC:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64 --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64/appleite.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

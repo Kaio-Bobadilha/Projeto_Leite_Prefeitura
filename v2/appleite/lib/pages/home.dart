@@ -7,6 +7,7 @@ import 'cadastro.dart';
 import 'comprovante_page.dart';
 import 'registro_coleta_page.dart'; // <-- 1. IMPORT ADICIONADO
 import '../services/api_service.dart';
+import 'Produtores.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -135,6 +136,18 @@ class HomePage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (_) => const RegistroColetaPage()),
+                    ),
+                  ),
+                  _buildMenuCard(
+                    context,
+                    'Produtores',
+                    'veja todos os produtores aqui',
+                    Icons.add_location_alt,
+                    Colors.teal,
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const Produtores()),
                     ),
                   ),
                   _buildMenuCard(

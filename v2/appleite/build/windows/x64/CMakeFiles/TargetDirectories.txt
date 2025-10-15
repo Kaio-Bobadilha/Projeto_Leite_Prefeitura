@@ -1,0 +1,10 @@
+C:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64/CMakeFiles/INSTALL.dir
+C:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64/CMakeFiles/ALL_BUILD.dir
+C:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64/CMakeFiles/ZERO_CHECK.dir
+C:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64/flutter/CMakeFiles/flutter_wrapper_plugin.dir
+C:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64/flutter/CMakeFiles/flutter_wrapper_app.dir
+C:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64/flutter/CMakeFiles/flutter_assemble.dir
+C:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64/flutter/CMakeFiles/INSTALL.dir
+C:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64/runner/CMakeFiles/appleite.dir
+C:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64/runner/CMakeFiles/INSTALL.dir
+C:/Users/acer/OneDrive/Documentos/projetos_flutter/projeto_integrador/Projeto_Leite_Prefeitura/v2/appleite/build/windows/x64/runner/CMakeFiles/ALL_BUILD.dir

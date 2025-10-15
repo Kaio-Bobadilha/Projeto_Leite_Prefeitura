@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\acer\OneDrive\Documentos\projetos_flutter\projeto_integrador\Projeto_Leite_Prefeitura\v2\appleite\build\windows\x64\CMakeFiles\3befc155b90554c40e256274a3eab0a6\flutter_windows.dll.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\acer\OneDrive\Documentos\projetos_flutter\projeto_integrador\Projeto_Leite_Prefeitura\v2\appleite\build\windows\x64\CMakeFiles\daf033beb9825ef07570925f03793fdb\flutter_assemble.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\acer\OneDrive\Documentos\projetos_flutter\projeto_integrador\Projeto_Leite_Prefeitura\v2\appleite\windows\flutter\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\acer\OneDrive\Documentos\projetos_flutter\projeto_integrador\Projeto_Leite_Prefeitura\v2\appleite\build\windows\x64\flutter\CMakeFiles\flutter_assemble" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{D7E4E453-2487-3103-B4FA-AAC4B1796B6B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

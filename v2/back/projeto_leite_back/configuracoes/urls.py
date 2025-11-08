@@ -1,22 +1,33 @@
 """
-URL configuration for projeto_leite_back project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+Configuração de URLs para a API e o Admin.
+Utiliza o DefaultRouter do DRF para criar as rotas RESTful automaticamente.
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
 
+# --- IMPORTAÇÕES DOS VIEWSETS DA API ---
+# Importe os ViewSets dos apps que contêm a lógica CRUD da API
+from apps.producers.views import ProdutorViewSet
+from apps.logistics.views import EntregadorViewSet
+# Certifique-se de que este app existe ou remova/comente se não existir
+# from apps.products.views import ProdutoViewSet 
+
+
+# --- CONFIGURAÇÃO DO ROUTER DRF ---
+# Cria o roteador para mapear ViewSets para URLs
+router = routers.DefaultRouter()
+router.register(r'produtores', ProdutorViewSet)
+router.register(r'entregadores', EntregadorViewSet)
+# router.register(r'produtos', ProdutoViewSet) 
+
+
+# --- DEFINIÇÃO DAS URLS PRINCIPAIS ---
 urlpatterns = [
+    # Rota para o painel de administração do Django
     path('admin/', admin.site.urls),
+    
+    # Rota para a API REST. Inclui todas as rotas definidas no router.
+    # Os endpoints serão acessíveis em: http://127.0.0.1:8000/api/
+    path('api/', include(router.urls)),
 ]

@@ -34,33 +34,26 @@ ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
-
 INSTALLED_APPS = [
+    # APPS PADRÃO E DE TERCEIROS (DEIXAR COMO ESTÃO)
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'rest_framework',
     'corsheaders',
-
-    # seus apps
-    'apps.core',
-    'apps.accounts',
-    'apps.producers',
+    'apps.core.apps.CoreConfig',
+    'apps.producers.apps.ProducersConfig',
+    'apps.logistics.apps.LogisticsConfig',
+    'apps.accounts',  
     'apps.dairies',
     'apps.coletas',
-    #'apps.orders',
-    #'apps.payments',
-    'apps.logistics',
     'apps.notifications',
     'apps.integrations',
     'apps.admin_tools',
-
-    # App de Produtos que vamos criar
-    #'apps.products', 
+    
 ]
 
 MIDDLEWARE = [
@@ -90,7 +83,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'settings.wsgi.application'
+WSGI_APPLICATION = 'configuracoes.wsgi.application'
 
 
 # Database

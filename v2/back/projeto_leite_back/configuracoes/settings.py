@@ -44,10 +44,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    
+    # SEUS APPS PERSONALIZADOS
     'apps.core.apps.CoreConfig',
     'apps.producers.apps.ProducersConfig',
     'apps.logistics.apps.LogisticsConfig',
-    'apps.accounts',  
+    
+    # 🌟 CORREÇÃO: O app 'products' PRECISA SER LISTADO AQUI!
+    'apps.products', 
+    
+    'apps.accounts',
     'apps.dairies',
     'apps.coletas',
     'apps.notifications',

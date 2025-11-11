@@ -142,7 +142,7 @@ class HomePage extends StatelessWidget {
                     context,
                     'Produtores',
                     'veja todos os produtores aqui',
-                    Icons.add_location_alt,
+                    Icons.person,
                     Colors.teal,
                     () => Navigator.push(
                       context,

@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ColetasConfig(AppConfig):
+class ColetorConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'coletas'
+    name = 'coletor'

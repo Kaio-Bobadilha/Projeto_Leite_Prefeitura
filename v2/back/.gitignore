@@ -1,0 +1,46 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+.venv/
+
+# Django stuff:
+*.log
+db.sqlite3
+media/
+staticfiles/
+static/
+local_settings.py
+
+# IDEs
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Pytest / coverage / reports
+.coverage
+htmlcov/
+*.cover
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Environment variables
+*.env
+.env.*
+
+# Pip / build
+pip-log.txt
+build/
+dist/
+*.egg-info/

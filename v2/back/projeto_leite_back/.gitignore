@@ -1,0 +1,12 @@
+# Arquivos de bytecode compilado e cache
+__pycache__/
+*.pyc
+
+# Ambientes virtuais (muito importante!)
+.venv/
+venv/
+env/
+
+# Arquivos do sistema operacional (ajuda na consistência entre plataformas)
+.DS_Store # macOS
+Thumbs.db # Windows

@@ -1,2 +1,4 @@
 # Ignora a extensão Local History
 .history/
+
+__pycache__/

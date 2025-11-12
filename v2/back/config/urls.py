@@ -11,4 +11,8 @@ router.register(r'laticinios', LaticinioViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/', include('coleta.urls')),
+    path('api/motoristas/', include('motorista.urls')),
+    path('api/coletores/', include('coletor.urls')),
+
 ]

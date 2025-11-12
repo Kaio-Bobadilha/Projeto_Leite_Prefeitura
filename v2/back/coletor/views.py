@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from .models import Coletor
+from .serializers import ColetorSerializer
 
-# Create your views here.
+class ColetorViewSet(viewsets.ModelViewSet):
+    queryset = Coletor.objects.all()
+    serializer_class = ColetorSerializer

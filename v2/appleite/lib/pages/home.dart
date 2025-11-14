@@ -8,6 +8,7 @@ import 'comprovante_page.dart';
 import 'registro_coleta_page.dart'; // <-- 1. IMPORT ADICIONADO
 import '../services/api_service.dart';
 import 'Produtores.dart';
+import 'cargas.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -140,9 +141,22 @@ class HomePage extends StatelessWidget {
                   ),
                   _buildMenuCard(
                     context,
+                    'Cargas',
+                    'veja todas suas cargas aqui',
+                    Icons.local_shipping,
+                    Colors.teal,
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CargasScreen(), 
+                      ),
+                    ),
+                  ),
+                  _buildMenuCard(
+                    context,
                     'Produtores',
                     'veja todos os produtores aqui',
-                    Icons.add_location_alt,
+                    Icons.person,
                     Colors.teal,
                     () => Navigator.push(
                       context,

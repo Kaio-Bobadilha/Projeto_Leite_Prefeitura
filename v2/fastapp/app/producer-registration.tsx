@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, User, MapPin, Phone, Mail } from 'lucide-react-native';
-import api from '../services/api';
 
 export default function ProducerRegistrationScreen() {
   const router = useRouter();
@@ -13,7 +12,6 @@ export default function ProducerRegistrationScreen() {
     name: '',
     cpfCnpj: '',
     address: '',
-    number: '',
     city: '',
     state: '',
     postalCode: '',
@@ -93,47 +91,17 @@ export default function ProducerRegistrationScreen() {
     return Object.keys(newErrors).length === 0;
   };
   
-  // Handle form submission (Atualizado para envio real via API)
-  const handleSubmit = async () => {
+  // Handle form submission
+  const handleSubmit = () => {
     if (validateForm()) {
       setIsLoading(true);
       
-      try {
-        // Limpa caracteres especiais para enviar apenas números
-        const rawCpfCnpj = formData.cpfCnpj.replace(/\D/g, '');
-        
-        // Lógica automática: Se > 11 dígitos é CNPJ (Jurídica), senão é CPF (Física)
-        const tipoPessoa = rawCpfCnpj.length > 11 ? 'JURIDICA' : 'FISICA';
-        
-        // Monta o objeto JSON exatamente como o Django espera (Models)
-        const payload = {
-          nome: formData.name,
-          cad_pro: formData.id, // Mapeando o ID do form para o cadastro do produtor
-          tipo_pessoa: tipoPessoa,
-          cpf: tipoPessoa === 'FISICA' ? rawCpfCnpj : null,
-          cnpj: tipoPessoa === 'JURIDICA' ? rawCpfCnpj : null,
-          
-          // Endereço
-          rua: formData.address,
-          numero: formData.number || 'S/N', // Envia S/N se não preenchido
-          cidade: formData.city,
-          estado: formData.state,
-          // O CEP (postalCode) não está no model do backend, então não enviamos para evitar erro
-          
-          // Campos obrigatórios do Django com valores padrão
-          tipo_inscricao_estadual: 'CONTRIBUINTE_ISENTO', 
-          
-          // Contato
-          email: formData.email,
-          telefone: formData.phone,
-        };
-
-        // Chamada POST para o backend
-        await api.post('/produtores/', payload);
-
+      // Simulate API call
+      setTimeout(() => {
+        setIsLoading(false);
         Alert.alert(
           'Success',
-          'Producer registered successfully in the database!',
+          'Producer registered successfully!',
           [
             {
               text: 'OK',
@@ -148,26 +116,13 @@ export default function ProducerRegistrationScreen() {
           name: '',
           cpfCnpj: '',
           address: '',
-          number: '',
           city: '',
           state: '',
           postalCode: '',
           phone: '',
           email: '',
         });
-
-      } catch (error: any) {
-        console.error('Erro no cadastro:', error);
-        
-        // Tenta pegar a mensagem de erro detalhada do Django
-        const errorMessage = error.response?.data 
-          ? JSON.stringify(error.response.data) 
-          : 'Failed to connect to server.';
-          
-        Alert.alert('Error', `Registration failed: ${errorMessage}`);
-      } finally {
-        setIsLoading(false);
-      }
+      }, 1500);
     }
   };
   
@@ -298,31 +253,17 @@ export default function ProducerRegistrationScreen() {
           {/* Address Section */}
           <View className="mb-5">
             <Text className="text-gray-700 font-medium mb-2">Full Address *</Text>
-            
-            {/* Linha 1: Rua e Número */}
-            <View className="flex-row gap-3 mb-3">
-              <View className="flex-1 relative">
-                <MapPin size={20} color="#7f8c8d" className="absolute left-4 top-4" />
-                <TextInput
-                  value={formData.address}
-                  onChangeText={(value) => handleChange('address', value)}
-                  placeholder="Street address"
-                  className={`border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-lg p-4 pl-12 text-gray-800 bg-gray-50`}
-                />
-              </View>
-              {/* Campo Número Novo */}
-              <View className="w-24">
-                <TextInput
-                  value={formData.number}
-                  onChangeText={(value) => handleChange('number', value)}
-                  placeholder="No."
-                  className="border border-gray-300 rounded-lg p-4 text-gray-800 bg-gray-50"
-                />
-              </View>
+            <View className="relative">
+              <MapPin size={20} color="#7f8c8d" className="absolute left-4 top-4" />
+              <TextInput
+                value={formData.address}
+                onChangeText={(value) => handleChange('address', value)}
+                placeholder="Street address"
+                className={`border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-lg p-4 pl-12 text-gray-800 bg-gray-50 mb-3`}
+              />
             </View>
             {errors.address && <Text className="text-red-500 mt-1">{errors.address}</Text>}
             
-            {/* Linha 2: Cidade, Estado, CEP */}
             <View className="flex-row gap-3">
               <View className="flex-1">
                 <TextInput
@@ -338,7 +279,7 @@ export default function ProducerRegistrationScreen() {
                 <TextInput
                   value={formData.state}
                   onChangeText={(value) => handleChange('state', value)}
-                  placeholder="UF"
+                  placeholder="State"
                   className={`border ${errors.state ? 'border-red-500' : 'border-gray-300'} rounded-lg p-4 text-gray-800 bg-gray-50`}
                   maxLength={2}
                 />
@@ -349,7 +290,7 @@ export default function ProducerRegistrationScreen() {
                 <TextInput
                   value={formData.postalCode}
                   onChangeText={handlePostalCodeChange}
-                  placeholder="CEP"
+                  placeholder="Postal code"
                   className={`border ${errors.postalCode ? 'border-red-500' : 'border-gray-300'} rounded-lg p-4 text-gray-800 bg-gray-50`}
                   keyboardType="numeric"
                 />

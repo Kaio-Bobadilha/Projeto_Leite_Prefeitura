@@ -2,13 +2,15 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.contenttypes.models import ContentType
+from .models import LoteColeta, NaoConformidade, AnaliseFisicoQuimica
 
 from .models import LoteColeta, NaoConformidade
 from .serializers import (
     LoteColetaSerializer, 
     LoteColetaWriteSerializer,
     NaoConformidadeSerializer,
-    RegistrarNCSerializer
+    RegistrarNCSerializer,
+    AnaliseFisicoQuimicaSerializer
 )
 
 class LoteColetaViewSet(viewsets.ModelViewSet):
@@ -44,3 +46,8 @@ class LoteColetaViewSet(viewsets.ModelViewSet):
 class NaoConformidadeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = NaoConformidade.objects.all()
     serializer_class = NaoConformidadeSerializer
+
+
+class AnaliseFisicoQuimicaViewSet(viewsets.ModelViewSet):
+    queryset = AnaliseFisicoQuimica.objects.all().order_by('-data_hora')
+    serializer_class = AnaliseFisicoQuimicaSerializer

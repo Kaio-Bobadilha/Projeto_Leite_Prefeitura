@@ -48,3 +48,25 @@ class NaoConformidade(models.Model):
 
     def __str__(self):
         return f"NC {self.id} - {self.descricao[:50]}..."
+
+
+class AnaliseFisicoQuimica(models.Model):
+    data_hora = models.DateTimeField(verbose_name="Data e Hora")
+    temperatura = models.FloatField(verbose_name="Temperatura (°C)")
+    ph = models.FloatField(verbose_name="pH")
+    acidez = models.FloatField(verbose_name="Acidez (%)")
+    densidade = models.FloatField(verbose_name="Densidade (g/cm³)")
+    crioscopia = models.FloatField(verbose_name="Crioscopia (°C)")
+    gordura = models.FloatField(verbose_name="Gordura (%)")
+    proteina = models.FloatField(verbose_name="Proteína (%)")
+    esd = models.FloatField(verbose_name="ESD")
+    est = models.FloatField(verbose_name="EST")
+    lactose = models.FloatField(verbose_name="Lactose (%)")
+    antibioticos = models.CharField(max_length=100, verbose_name="Antibióticos", blank=True, null=True)
+    conservantes = models.CharField(max_length=100, verbose_name="Conservantes", blank=True, null=True)
+    analista = models.CharField(max_length=200, verbose_name="Analista Responsável")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Análise {self.id} - {self.data_hora}"

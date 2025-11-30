@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Save } from 'lucide-react-native';
 
@@ -45,8 +45,8 @@ export default function PhysicalChemicalAnalysisScreen() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    // Required fields
-    if (!formData.dateTime.trim()) newErrors.dateTime = 'Date/time is required';
+    // Required fields (Note: dateTime is handled automatically on submit now, but keeping generic validation if user enters it)
+    // if (!formData.dateTime.trim()) newErrors.dateTime = 'Date/time is required'; 
     if (!formData.temperature.trim()) newErrors.temperature = 'Temperature is required';
     if (!formData.ph.trim()) newErrors.ph = 'pH is required';
     if (!formData.acidity.trim()) newErrors.acidity = 'Acidity is required';
@@ -60,62 +60,78 @@ export default function PhysicalChemicalAnalysisScreen() {
     if (!formData.analyst.trim()) newErrors.analyst = 'Analyst is required';
     
     // Numeric validations
-    if (formData.temperature && isNaN(Number(formData.temperature))) {
-      newErrors.temperature = 'Must be a valid number';
-    }
-    
-    if (formData.ph && isNaN(Number(formData.ph))) {
-      newErrors.ph = 'Must be a valid number';
-    }
-    
-    if (formData.acidity && isNaN(Number(formData.acidity))) {
-      newErrors.acidity = 'Must be a valid number';
-    }
-    
-    if (formData.density && isNaN(Number(formData.density))) {
-      newErrors.density = 'Must be a valid number';
-    }
-    
-    if (formData.cryoscopy && isNaN(Number(formData.cryoscopy))) {
-      newErrors.cryoscopy = 'Must be a valid number';
-    }
-    
-    if (formData.fat && isNaN(Number(formData.fat))) {
-      newErrors.fat = 'Must be a valid number';
-    }
-    
-    if (formData.protein && isNaN(Number(formData.protein))) {
-      newErrors.protein = 'Must be a valid number';
-    }
-    
-    if (formData.esd && isNaN(Number(formData.esd))) {
-      newErrors.esd = 'Must be a valid number';
-    }
-    
-    if (formData.est && isNaN(Number(formData.est))) {
-      newErrors.est = 'Must be a valid number';
-    }
-    
-    if (formData.lactose && isNaN(Number(formData.lactose))) {
-      newErrors.lactose = 'Must be a valid number';
-    }
+    if (formData.temperature && isNaN(Number(formData.temperature))) newErrors.temperature = 'Must be a valid number';
+    if (formData.ph && isNaN(Number(formData.ph))) newErrors.ph = 'Must be a valid number';
+    if (formData.acidity && isNaN(Number(formData.acidity))) newErrors.acidity = 'Must be a valid number';
+    if (formData.density && isNaN(Number(formData.density))) newErrors.density = 'Must be a valid number';
+    if (formData.cryoscopy && isNaN(Number(formData.cryoscopy))) newErrors.cryoscopy = 'Must be a valid number';
+    if (formData.fat && isNaN(Number(formData.fat))) newErrors.fat = 'Must be a valid number';
+    if (formData.protein && isNaN(Number(formData.protein))) newErrors.protein = 'Must be a valid number';
+    if (formData.esd && isNaN(Number(formData.esd))) newErrors.esd = 'Must be a valid number';
+    if (formData.est && isNaN(Number(formData.est))) newErrors.est = 'Must be a valid number';
+    if (formData.lactose && isNaN(Number(formData.lactose))) newErrors.lactose = 'Must be a valid number';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
   
-  // Handle form submission
-  const handleSubmit = () => {
+  // Handle form submission - CONNECTED TO BACKEND
+  const handleSubmit = async () => {
     if (validateForm()) {
-      // In a real app, this would send data to a backend
-      console.log('Form submitted:', formData);
-      Alert.alert(
-        'Success',
-        'Physical-Chemical Analysis Report saved successfully!',
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
+
+      try {
+        // URL da API (use o IP da sua máquina se for celular, ou localhost se for web/emulador android via proxy reverso)
+        // Se estiver no Emulador Android padrão sem proxy, use 'http://10.0.2.2:8000/api/...'
+        const baseUrl = Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000';
+        const apiUrl = `${baseUrl}/api/analises-fisico-quimicas/`;
+        
+        console.log(`Tentando conectar em: ${apiUrl}`);
+        // Gera Data/Hora atual ISO 8601 (YYYY-MM-DDTHH:mm:ss.sssZ) que o Django aceita
+        const now = new Date().toISOString(); 
+
+        const payload = {
+          data_hora: now,
+          temperatura: parseFloat(formData.temperature),
+          ph: parseFloat(formData.ph),
+          acidez: parseFloat(formData.acidity),
+          densidade: parseFloat(formData.density),
+          crioscopia: parseFloat(formData.cryoscopy),
+          gordura: parseFloat(formData.fat),
+          proteina: parseFloat(formData.protein),
+          esd: parseFloat(formData.esd),
+          est: parseFloat(formData.est),
+          lactose: parseFloat(formData.lactose),
+          antibioticos: formData.antibiotics,
+          conservantes: formData.preservatives,
+          analista: formData.analyst
+        };
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(JSON.stringify(errorData));
+        }
+
+        Alert.alert(
+          'Sucesso',
+          'Relatório de Análise Físico-Química salvo com sucesso!',
+          [{ text: 'OK', onPress: () => router.back() }]
+        );
+
+      } catch (error: any) {
+        console.error('Erro ao salvar:', error);
+        Alert.alert('Erro', `Falha ao salvar: ${error.message}`);
+      }
     } else {
-      Alert.alert('Validation Error', 'Please fix the highlighted errors before submitting.');
+      Alert.alert('Erro de Validação', 'Por favor, corrija os erros destacados.');
     }
   };
 
@@ -144,14 +160,14 @@ export default function PhysicalChemicalAnalysisScreen() {
           <Text className="text-gray-500 mb-4">Enter the physical and chemical properties of the sample</Text>
           
           <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
-            <Text className="text-gray-500 text-xs mb-1">Date/Time *</Text>
+            <Text className="text-gray-500 text-xs mb-1">Date/Time (Auto-generated on save)</Text>
             <TextInput
               value={formData.dateTime}
               onChangeText={(value) => handleInputChange('dateTime', value)}
-              placeholder="DD/MM/YYYY HH:MM"
-              className={`border rounded-lg p-3 ${errors.dateTime ? 'border-red-500' : 'border-gray-300'}`}
+              placeholder="Will be set to NOW automatically"
+              editable={false} // Desabilitado pois geramos automático no submit
+              className={`border rounded-lg p-3 bg-gray-100 text-gray-500 ${errors.dateTime ? 'border-red-500' : 'border-gray-300'}`}
             />
-            {errors.dateTime ? <Text className="text-red-500 text-xs mt-1">{errors.dateTime}</Text> : null}
           </View>
           
           <View className="flex-row flex-wrap gap-4">

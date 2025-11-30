@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # 1. Banco de Dados
   db:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     container_name: leite_db_dev
     environment:
       POSTGRES_DB: Projeto_Leite

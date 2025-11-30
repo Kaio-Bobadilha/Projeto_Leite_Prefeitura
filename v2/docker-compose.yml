@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # 1. Banco de Dados
+  db:
+    image: postgres:15-alpine
+    container_name: leite_db_dev
+    environment:
+      POSTGRES_DB: Projeto_Leite
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Backend (Django)
+  backend:
+    build: ./back
+    container_name: leite_backend_dev
+    volumes:
+      - ./back:/app # Sincronização em tempo real para edição
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_DB: Projeto_Leite
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+    # Ativa o "Watch" para reiniciar o Django se você mudar arquivos Python
+    develop:
+      watch:
+        - action: sync
+          path: ./back
+          target: /app
+          ignore:
+            - __pycache__/
+            - db.sqlite3
+            - .git/
+
+  # 3. Frontend (Expo Web)
+  frontend:
+    build: ./fastapp-expo/fastapp
+    container_name: leite_frontend_dev
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./fastapp-expo/fastapp:/app
+      - /app/node_modules # Evita sobrescrever node_modules do container com o local
+    environment:
+      # Configura a URL da API para o frontend saber onde bater
+      EXPO_PUBLIC_API_URL: http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data_dev:

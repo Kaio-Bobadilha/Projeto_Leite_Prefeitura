@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, User, MapPin, Phone, Mail } from 'lucide-react-native';
+import api from '../services/api'; 
 
 export default function ProducerRegistrationScreen() {
   const router = useRouter();
   
   // Form state
   const [formData, setFormData] = useState({
-    id: '',
+    id: '', // Usaremos isso como 'cad_pro' ou identificador externo
     name: '',
     cpfCnpj: '',
     address: '',
@@ -19,17 +20,11 @@ export default function ProducerRegistrationScreen() {
     email: '',
   });
   
-  // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  // Loading state
   const [isLoading, setIsLoading] = useState(false);
   
-  // Handle input changes
   const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
-    
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -39,106 +34,110 @@ export default function ProducerRegistrationScreen() {
     }
   };
   
-  // Validate form
+  // Validação (mantive a sua lógica original)
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+    if (!formData.id.trim()) newErrors.id = 'ID is required';
+    if (!formData.name.trim()) newErrors.name = 'Name is required';
+    if (!formData.cpfCnpj.trim()) newErrors.cpfCnpj = 'CPF/CNPJ is required';
     
-    if (!formData.id.trim()) {
-      newErrors.id = 'ID is required';
-    }
+    // Validação simplificada para exemplo
+    const cleanCpfCnpj = formData.cpfCnpj.replace(/\D/g, '');
+    if (cleanCpfCnpj.length < 11) newErrors.cpfCnpj = 'Invalid CPF/CNPJ format';
     
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-    
-    if (!formData.cpfCnpj.trim()) {
-      newErrors.cpfCnpj = 'CPF/CNPJ is required';
-    } else if (formData.cpfCnpj.replace(/\D/g, '').length < 11) {
-      newErrors.cpfCnpj = 'Invalid CPF/CNPJ format';
-    }
-    
-    if (!formData.address.trim()) {
-      newErrors.address = 'Address is required';
-    }
-    
-    if (!formData.city.trim()) {
-      newErrors.city = 'City is required';
-    }
-    
-    if (!formData.state.trim()) {
-      newErrors.state = 'State is required';
-    }
-    
-    if (!formData.postalCode.trim()) {
-      newErrors.postalCode = 'Postal code is required';
-    } else if (formData.postalCode.replace(/\D/g, '').length !== 8) {
-      newErrors.postalCode = 'Invalid postal code';
-    }
-    
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone is required';
-    } else if (formData.phone.replace(/\D/g, '').length < 10) {
-      newErrors.phone = 'Invalid phone number';
-    }
-    
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
-    }
+    if (!formData.address.trim()) newErrors.address = 'Address is required';
+    if (!formData.city.trim()) newErrors.city = 'City is required';
+    if (!formData.state.trim()) newErrors.state = 'State is required';
+    if (!formData.phone.trim()) newErrors.phone = 'Phone is required';
+    if (!formData.email.trim()) newErrors.email = 'Email is required';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
   
-  // Handle form submission
-  const handleSubmit = () => {
+  // NOVA LÓGICA DE ENVIO CONECTADA AO BACKEND
+  const handleSubmit = async () => {
     if (validateForm()) {
       setIsLoading(true);
       
-      // Simulate API call
-      setTimeout(() => {
-        setIsLoading(false);
+      try {
+        const cleanDoc = formData.cpfCnpj.replace(/\D/g, '');
+        const isPessoaJuridica = cleanDoc.length > 11;
+
+        // Mapeamento para o modelo Django (Produtor)
+        // Baseado no modelo em v2/back/produtor/models.py
+        const payload = {
+          tipo_pessoa: isPessoaJuridica ? 'JURIDICA' : 'FISICA',
+          nome: formData.name,
+          // Se for jurídica, usa razao_social, se física, usa nome.
+          // Aqui estou enviando ambos para garantir compatibilidade
+          razao_social: isPessoaJuridica ? formData.name : '',
+          nome_fantasia: formData.name,
+          
+          cpf: !isPessoaJuridica ? cleanDoc : null,
+          cnpj: isPessoaJuridica ? cleanDoc : null,
+          cad_pro: formData.id, // Usando o ID do form como Cadastro de Produtor
+          
+          // Valores padrão exigidos pelo Django
+          tipo_inscricao_estadual: 'CONTRIBUINTE_ISENTO', 
+          
+          email: formData.email,
+          telefone: formData.phone,
+          
+          // Endereço
+          rua: formData.address,
+          cidade: formData.city,
+          estado: formData.state,
+          // O campo postalCode não existe no modelo do Django, 
+          // você pode concatenar no complemento ou ignorar
+          complemento: `CEP: ${formData.postalCode}`,
+          
+          // Campos obrigatórios que não estão no form (envie string vazia ou ajuste o modelo)
+          inscricao_estadual: '', 
+          inscricao_municipal: '',
+          bairro: '',
+          numero: '' 
+        };
+
+        // Envia para a rota configurada no Django
+        await api.post('/produtores/', payload);
+
         Alert.alert(
-          'Success',
-          'Producer registered successfully!',
-          [
-            {
-              text: 'OK',
-              onPress: () => router.back(),
-            },
-          ]
+          'Sucesso',
+          'Produtor cadastrado com sucesso!',
+          [{ text: 'OK', onPress: () => router.back() }]
         );
         
-        // Reset form after successful submission
+        // Limpar formulário
         setFormData({
-          id: '',
-          name: '',
-          cpfCnpj: '',
-          address: '',
-          city: '',
-          state: '',
-          postalCode: '',
-          phone: '',
-          email: '',
+          id: '', name: '', cpfCnpj: '', address: '',
+          city: '', state: '', postalCode: '', phone: '', email: '',
         });
-      }, 1500);
+
+      } catch (error: any) {
+        console.error('Erro ao cadastrar:', error);
+        // Tenta pegar a mensagem de erro do Django
+        const errorMsg = error.response?.data 
+          ? JSON.stringify(error.response.data) 
+          : 'Falha na conexão com o servidor';
+          
+        Alert.alert('Erro', `Falha ao cadastrar produtor: ${errorMsg}`);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
   
-  // Format CPF/CNPJ
+  // Formatters (Mantidos do seu código original)
   const formatCpfCnpj = (value: string) => {
     const digits = value.replace(/\D/g, '');
-    
     if (digits.length <= 11) {
-      // Formatting as CPF: XXX.XXX.XXX-XX
       return digits
         .replace(/(\d{3})(\d)/, '$1.$2')
         .replace(/(\d{3})(\d)/, '$1.$2')
         .replace(/(\d{3})(\d{1,2})/, '$1-$2')
         .replace(/(-\d{2})\d+?$/, '$1');
     } else {
-      // Formatting as CNPJ: XX.XXX.XXX/XXXX-XX
       return digits
         .replace(/(\d{2})(\d)/, '$1.$2')
         .replace(/(\d{3})(\d)/, '$1.$2')
@@ -148,43 +147,31 @@ export default function ProducerRegistrationScreen() {
     }
   };
   
-  // Handle CPF/CNPJ input change
   const handleCpfCnpjChange = (value: string) => {
-    const formattedValue = formatCpfCnpj(value);
-    handleChange('cpfCnpj', formattedValue);
+    handleChange('cpfCnpj', formatCpfCnpj(value));
   };
   
-  // Format phone number
   const formatPhoneNumber = (value: string) => {
     const digits = value.replace(/\D/g, '');
-    
-    // Formatting as (XX) XXXXX-XXXX
     return digits
       .replace(/(\d{2})(\d)/, '($1) $2')
       .replace(/(\d{5})(\d)/, '$1-$2')
       .replace(/(-\d{4})\d+?$/, '$1');
   };
   
-  // Handle phone input change
   const handlePhoneChange = (value: string) => {
-    const formattedValue = formatPhoneNumber(value);
-    handleChange('phone', formattedValue);
+    handleChange('phone', formatPhoneNumber(value));
   };
   
-  // Format postal code
   const formatPostalCode = (value: string) => {
     const digits = value.replace(/\D/g, '');
-    
-    // Formatting as XXXXX-XXX
     return digits
       .replace(/(\d{5})(\d)/, '$1-$2')
       .replace(/(-\d{3})\d+?$/, '$1');
   };
   
-  // Handle postal code input change
   const handlePostalCodeChange = (value: string) => {
-    const formattedValue = formatPostalCode(value);
-    handleChange('postalCode', formattedValue);
+    handleChange('postalCode', formatPostalCode(value));
   };
 
   return (

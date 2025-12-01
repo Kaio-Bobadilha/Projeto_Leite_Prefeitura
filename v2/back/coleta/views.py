@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.contenttypes.models import ContentType
-from .models import LoteColeta, NaoConformidade, AnaliseFisicoQuimica
+from .models import LoteColeta, NaoConformidade, AnaliseFisicoQuimica, ControlePasteurizacao, ControleAntibiotico, ResumoAdulterantes
 
 from .models import LoteColeta, NaoConformidade
 from .serializers import (
@@ -10,7 +10,10 @@ from .serializers import (
     LoteColetaWriteSerializer,
     NaoConformidadeSerializer,
     RegistrarNCSerializer,
-    AnaliseFisicoQuimicaSerializer
+    AnaliseFisicoQuimicaSerializer,
+    ControlePasteurizacaoSerializer, 
+    ControleAntibioticoSerializer, 
+    ResumoAdulterantesSerializer
 )
 
 class LoteColetaViewSet(viewsets.ModelViewSet):
@@ -51,3 +54,15 @@ class NaoConformidadeViewSet(viewsets.ReadOnlyModelViewSet):
 class AnaliseFisicoQuimicaViewSet(viewsets.ModelViewSet):
     queryset = AnaliseFisicoQuimica.objects.all().order_by('-data_hora')
     serializer_class = AnaliseFisicoQuimicaSerializer
+
+class ControlePasteurizacaoViewSet(viewsets.ModelViewSet):
+    queryset = ControlePasteurizacao.objects.all().order_by('-created_at')
+    serializer_class = ControlePasteurizacaoSerializer
+
+class ControleAntibioticoViewSet(viewsets.ModelViewSet):
+    queryset = ControleAntibiotico.objects.all().order_by('-created_at')
+    serializer_class = ControleAntibioticoSerializer
+
+class ResumoAdulterantesViewSet(viewsets.ModelViewSet):
+    queryset = ResumoAdulterantes.objects.all().order_by('-created_at')
+    serializer_class = ResumoAdulterantesSerializer

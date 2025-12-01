@@ -47,17 +47,19 @@ services:
 
   # 3. Frontend (Expo Web)
   frontend:
-    build: ./fastapp-expo/fastapp
+    build: ./fastapp
     container_name: leite_frontend_dev
     ports:
       - "8081:8081"
     volumes:
-      - ./fastapp-expo/fastapp:/app
+      - ./fastapp:/app
       - /app/node_modules # Evita sobrescrever node_modules do container com o local
+    stdin_open: true 
+    tty: true
     environment:
       # Configura a URL da API para o frontend saber onde bater
       - EXPO_PUBLIC_API_URL=http://localhost:8000
-      - NODE_OPTIONS=--max-old-space-size=4096
+      - NODE_OPTIONS=--max-old-space-size=2096
 
     depends_on:
       - backend

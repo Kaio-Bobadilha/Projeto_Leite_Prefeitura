@@ -8,37 +8,36 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { ChevronLeft, User, MapPin, Phone, Mail } from "lucide-react-native";
+
+// Use o IP da sua máquina se for rodar no celular, ou localhost se for web
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function ProducerRegistrationScreen() {
   const router = useRouter();
 
   // Form state
   const [formData, setFormData] = useState({
-    id: "",
     name: "",
     cpfCnpj: "",
     address: "",
-    city: "",
+    number: "",
+    neighborhood: "", 
     state: "",
     postalCode: "",
     phone: "",
     email: "",
   });
 
-  // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // Loading state
   const [isLoading, setIsLoading] = useState(false);
 
   // Handle input changes
   const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
-
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -48,102 +47,16 @@ export default function ProducerRegistrationScreen() {
     }
   };
 
-  // Validate form
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.id.trim()) {
-      newErrors.id = "ID is required";
-    }
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    if (!formData.cpfCnpj.trim()) {
-      newErrors.cpfCnpj = "CPF/CNPJ is required";
-    } else if (formData.cpfCnpj.replace(/\D/g, "").length < 11) {
-      newErrors.cpfCnpj = "Invalid CPF/CNPJ format";
-    }
-
-    if (!formData.address.trim()) {
-      newErrors.address = "Address is required";
-    }
-
-    if (!formData.city.trim()) {
-      newErrors.city = "City is required";
-    }
-
-    if (!formData.state.trim()) {
-      newErrors.state = "State is required";
-    }
-
-    if (!formData.postalCode.trim()) {
-      newErrors.postalCode = "Postal code is required";
-    } else if (formData.postalCode.replace(/\D/g, "").length !== 8) {
-      newErrors.postalCode = "Invalid postal code";
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Phone is required";
-    } else if (formData.phone.replace(/\D/g, "").length < 10) {
-      newErrors.phone = "Invalid phone number";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Invalid email format";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle form submission
-  const handleSubmit = () => {
-    if (validateForm()) {
-      setIsLoading(true);
-
-      // Simulate API call
-      setTimeout(() => {
-        setIsLoading(false);
-        Alert.alert("Success", "Producer registered successfully!", [
-          {
-            text: "OK",
-            onPress: () => router.back(),
-          },
-        ]);
-
-        // Reset form after successful submission
-        setFormData({
-          id: "",
-          name: "",
-          cpfCnpj: "",
-          address: "",
-          city: "",
-          state: "",
-          postalCode: "",
-          phone: "",
-          email: "",
-        });
-      }, 1500);
-    }
-  };
-
   // Format CPF/CNPJ
   const formatCpfCnpj = (value: string) => {
     const digits = value.replace(/\D/g, "");
-
     if (digits.length <= 11) {
-      // Formatting as CPF: XXX.XXX.XXX-XX
       return digits
         .replace(/(\d{3})(\d)/, "$1.$2")
         .replace(/(\d{3})(\d)/, "$1.$2")
         .replace(/(\d{3})(\d{1,2})/, "$1-$2")
         .replace(/(-\d{2})\d+?$/, "$1");
     } else {
-      // Formatting as CNPJ: XX.XXX.XXX/XXXX-XX
       return digits
         .replace(/(\d{2})(\d)/, "$1.$2")
         .replace(/(\d{3})(\d)/, "$1.$2")
@@ -153,43 +66,84 @@ export default function ProducerRegistrationScreen() {
     }
   };
 
-  // Handle CPF/CNPJ input change
   const handleCpfCnpjChange = (value: string) => {
-    const formattedValue = formatCpfCnpj(value);
-    handleChange("cpfCnpj", formattedValue);
+    handleChange("cpfCnpj", formatCpfCnpj(value));
   };
 
-  // Format phone number
-  const formatPhoneNumber = (value: string) => {
-    const digits = value.replace(/\D/g, "");
+  // Validate form
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.name.trim()) newErrors.name = "Nome é obrigatório";
+    
+    const cleanDoc = formData.cpfCnpj.replace(/\D/g, "");
+    if (!cleanDoc) newErrors.cpfCnpj = "CPF/CNPJ é obrigatório";
+    
+    if (!formData.address.trim()) newErrors.address = "Rua é obrigatória";
+    if (!formData.city.trim()) newErrors.city = "Cidade é obrigatória";
+    if (!formData.state.trim()) newErrors.state = "Estado é obrigatório";
 
-    // Formatting as (XX) XXXXX-XXXX
-    return digits
-      .replace(/(\d{2})(\d)/, "($1) $2")
-      .replace(/(\d{5})(\d)/, "$1-$2")
-      .replace(/(-\d{4})\d+?$/, "$1");
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  // Handle phone input change
-  const handlePhoneChange = (value: string) => {
-    const formattedValue = formatPhoneNumber(value);
-    handleChange("phone", formattedValue);
-  };
+  // Handle form submission
+  const handleSubmit = async () => {
+    if (validateForm()) {
+      setIsLoading(true);
 
-  // Format postal code
-  const formatPostalCode = (value: string) => {
-    const digits = value.replace(/\D/g, "");
+      try {
+        const cleanDoc = formData.cpfCnpj.replace(/\D/g, "");
+        const isPessoaJuridica = cleanDoc.length > 11;
 
-    // Formatting as XXXXX-XXX
-    return digits
-      .replace(/(\d{5})(\d)/, "$1-$2")
-      .replace(/(-\d{3})\d+?$/, "$1");
-  };
+        // Payload mapeado para o modelo Django (Produtor)
+        const payload = {
+            tipo_pessoa: isPessoaJuridica ? 'JURIDICA' : 'FISICA',
+            nome: formData.name, // Usando 'nome' para ambos por simplificação
+            razao_social: isPessoaJuridica ? formData.name : null,
+            cpf: isPessoaJuridica ? null : cleanDoc,
+            cnpj: isPessoaJuridica ? cleanDoc : null,
+            
+            // Campos de endereço
+            rua: formData.address,
+            numero: formData.number || "S/N",
+            bairro: formData.neighborhood || "",
+            cidade: formData.city,
+            estado: formData.state.toUpperCase(),
+            
+            // Contato
+            email: formData.email || "naoinformado@exemplo.com",
+            telefone: formData.phone,
 
-  // Handle postal code input change
-  const handlePostalCodeChange = (value: string) => {
-    const formattedValue = formatPostalCode(value);
-    handleChange("postalCode", formattedValue);
+            // Padrões obrigatórios do Backend (Defaults)
+            tipo_inscricao_estadual: "NAO_CONTRIBUINTE_DE_ICMS", 
+        };
+
+        const response = await fetch(`${API_URL}/api/produtores/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            Alert.alert("Sucesso", "Produtor registrado com sucesso!", [
+                { text: "OK", onPress: () => router.back() }
+            ]);
+        } else {
+            let errorMsg = "Erro ao salvar:\n";
+            Object.keys(data).forEach(key => {
+                errorMsg += `${key}: ${data[key]}\n`;
+            });
+            Alert.alert("Erro de Validação", errorMsg);
+        }
+
+      } catch (error: any) {
+        Alert.alert("Erro", "Falha na conexão: " + error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   return (
@@ -198,198 +152,136 @@ export default function ProducerRegistrationScreen() {
       className="flex-1 bg-gray-50"
     >
       <ScrollView className="flex-1 px-4 pt-12 pb-6">
-        {/* Header */}
         <View className="mb-6">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="flex-row items-center mb-4"
-          >
+          <TouchableOpacity onPress={() => router.back()} className="flex-row items-center mb-4">
             <ChevronLeft color="#3498db" size={24} />
-            <Text className="ml-2 text-blue-500 text-lg font-medium">Back</Text>
+            <Text className="ml-2 text-blue-500 text-lg font-medium">Voltar</Text>
           </TouchableOpacity>
-
-          <Text className="text-3xl font-bold text-gray-800 mb-2">
-            Cadastro de produtor
-          </Text>
-          <Text className="text-gray-600">
-            Cadastre um novo produtor no sistema
-          </Text>
+          <Text className="text-3xl font-bold text-gray-800 mb-2">Cadastro de Produtor</Text>
+          <Text className="text-gray-600">Cadastre um novo produtor no sistema</Text>
         </View>
 
-        {/* Form */}
         <View className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          {/* ID Field */}
           <View className="mb-5">
-            <Text className="text-gray-700 font-medium mb-2">
-              Producer ID *
-            </Text>
-            <TextInput
-              value={formData.id}
-              onChangeText={(value) => handleChange("id", value)}
-              placeholder="Enter producer ID"
-              className={`border ${errors.id ? "border-red-500" : "border-gray-300"} rounded-lg p-4 text-gray-800 bg-gray-50`}
-              keyboardType="numeric"
-            />
-            {errors.id && (
-              <Text className="text-red-500 mt-1">{errors.id}</Text>
-            )}
-          </View>
-
-          {/* Name Field */}
-          <View className="mb-5">
-            <Text className="text-gray-700 font-medium mb-2">
-              Nome completo*
-            </Text>
+            <Text className="text-gray-700 font-medium mb-2">Nome Completo / Razão Social *</Text>
             <View className="relative">
-              <User
-                size={20}
-                color="#7f8c8d"
-                className="absolute left-4 top-4"
-              />
+              <User size={20} color="#7f8c8d" className="absolute left-4 top-4" />
               <TextInput
                 value={formData.name}
                 onChangeText={(value) => handleChange("name", value)}
-                placeholder="Insira o nome completo"
-                className={`border ${errors.name ? "border-red-500" : "border-gray-300"} rounded-lg p-4 pl-12 text-gray-800 bg-gray-50`}
+                placeholder="Insira o nome"
+                className={`border ${errors.name ? "border-red-500" : "border-gray-300"} rounded-lg p-4 pl-12 bg-gray-50`}
               />
             </View>
-            {errors.name && (
-              <Text className="text-red-500 mt-1">{errors.name}</Text>
-            )}
+            {errors.name && <Text className="text-red-500 mt-1">{errors.name}</Text>}
           </View>
 
-          {/* CPF/CNPJ Field */}
           <View className="mb-5">
-            <Text className="text-gray-700 font-medium mb-2">CPF/CNPJ *</Text>
+            <Text className="text-gray-700 font-medium mb-2">CPF / CNPJ *</Text>
             <TextInput
               value={formData.cpfCnpj}
               onChangeText={handleCpfCnpjChange}
-              placeholder="Insira CPF ou CNPJ"
-              className={`border ${errors.cpfCnpj ? "border-red-500" : "border-gray-300"} rounded-lg p-4 text-gray-800 bg-gray-50`}
+              placeholder="000.000.000-00"
+              className={`border ${errors.cpfCnpj ? "border-red-500" : "border-gray-300"} rounded-lg p-4 bg-gray-50`}
               keyboardType="numeric"
             />
-            {errors.cpfCnpj && (
-              <Text className="text-red-500 mt-1">{errors.cpfCnpj}</Text>
-            )}
+            {errors.cpfCnpj && <Text className="text-red-500 mt-1">{errors.cpfCnpj}</Text>}
           </View>
 
-          {/* Address Section */}
           <View className="mb-5">
-            <Text className="text-gray-700 font-medium mb-2">
-              Endereço completo
-            </Text>
+            <Text className="text-gray-700 font-medium mb-2">Endereço (Rua) *</Text>
             <View className="relative">
-              <MapPin
-                size={20}
-                color="#7f8c8d"
-                className="absolute left-4 top-4"
-              />
+              <MapPin size={20} color="#7f8c8d" className="absolute left-4 top-4" />
               <TextInput
                 value={formData.address}
                 onChangeText={(value) => handleChange("address", value)}
-                placeholder="Rua"
-                className={`border ${errors.address ? "border-red-500" : "border-gray-300"} rounded-lg p-4 pl-12 text-gray-800 bg-gray-50 mb-3`}
+                placeholder="Nome da Rua"
+                className={`border ${errors.address ? "border-red-500" : "border-gray-300"} rounded-lg p-4 pl-12 bg-gray-50`}
               />
             </View>
-            {errors.address && (
-              <Text className="text-red-500 mt-1">{errors.address}</Text>
-            )}
+            {errors.address && <Text className="text-red-500 mt-1">{errors.address}</Text>}
+          </View>
 
-            <View className="flex-row gap-3">
-              <View className="flex-1">
-                <TextInput
-                  value={formData.city}
-                  onChangeText={(value) => handleChange("city", value)}
-                  placeholder="Cidade"
-                  className={`border ${errors.city ? "border-red-500" : "border-gray-300"} rounded-lg p-4 text-gray-800 bg-gray-50`}
-                />
-                {errors.city && (
-                  <Text className="text-red-500 mt-1">{errors.city}</Text>
-                )}
-              </View>
+            <View className="flex-row gap-3 mb-5">
+                 <View className="flex-1">
+                    <Text className="text-gray-700 font-medium mb-2">Número</Text>
+                    <TextInput
+                        value={formData.number}
+                        onChangeText={(value) => handleChange("number", value)}
+                        placeholder="Nº"
+                        className="border border-gray-300 rounded-lg p-4 bg-gray-50"
+                    />
+                 </View>
+                 <View className="flex-[2]">
+                    <Text className="text-gray-700 font-medium mb-2">Bairro</Text>
+                    <TextInput
+                        value={formData.neighborhood}
+                        onChangeText={(value) => handleChange("neighborhood", value)}
+                        placeholder="Bairro"
+                        className="border border-gray-300 rounded-lg p-4 bg-gray-50"
+                    />
+                 </View>
+            </View>
 
-              <View className="w-20">
-                <TextInput
-                  value={formData.state}
-                  onChangeText={(value) => handleChange("state", value)}
-                  placeholder="Estado"
-                  className={`border ${errors.state ? "border-red-500" : "border-gray-300"} rounded-lg p-4 text-gray-800 bg-gray-50`}
-                  maxLength={2}
-                />
-                {errors.state && (
-                  <Text className="text-red-500 mt-1">{errors.state}</Text>
-                )}
-              </View>
-
-              <View className="flex-1">
-                <TextInput
-                  value={formData.postalCode}
-                  onChangeText={handlePostalCodeChange}
-                  placeholder="CEP"
-                  className={`border ${errors.postalCode ? "border-red-500" : "border-gray-300"} rounded-lg p-4 text-gray-800 bg-gray-50`}
-                  keyboardType="numeric"
-                />
-                {errors.postalCode && (
-                  <Text className="text-red-500 mt-1">{errors.postalCode}</Text>
-                )}
-              </View>
+          <View className="flex-row gap-3 mb-5">
+            <View className="flex-[2]">
+                <Text className="text-gray-700 font-medium mb-2">Cidade *</Text>
+              <TextInput
+                value={formData.city}
+                onChangeText={(value) => handleChange("city", value)}
+                placeholder="Cidade"
+                className={`border ${errors.city ? "border-red-500" : "border-gray-300"} rounded-lg p-4 bg-gray-50`}
+              />
+            </View>
+            <View className="flex-1">
+                <Text className="text-gray-700 font-medium mb-2">UF *</Text>
+              <TextInput
+                value={formData.state}
+                onChangeText={(value) => handleChange("state", value)}
+                placeholder="PR"
+                className={`border ${errors.state ? "border-red-500" : "border-gray-300"} rounded-lg p-4 bg-gray-50`}
+                maxLength={2}
+                autoCapitalize="characters"
+              />
             </View>
           </View>
 
-          {/* Contact Information */}
           <View className="mb-5">
-            <Text className="text-gray-700 font-medium mb-2">
-              Informações de contato
-            </Text>
-
+            <Text className="text-gray-700 font-medium mb-2">Contato</Text>
             <View className="relative mb-3">
-              <Phone
-                size={20}
-                color="#7f8c8d"
-                className="absolute left-4 top-4"
-              />
+              <Phone size={20} color="#7f8c8d" className="absolute left-4 top-4" />
               <TextInput
                 value={formData.phone}
-                onChangeText={handlePhoneChange}
+                onChangeText={(value) => handleChange("phone", value)}
                 placeholder="(00) 00000-0000"
-                className={`border ${errors.phone ? "border-red-500" : "border-gray-300"} rounded-lg p-4 pl-12 text-gray-800 bg-gray-50`}
+                className="border border-gray-300 rounded-lg p-4 pl-12 bg-gray-50"
                 keyboardType="phone-pad"
               />
             </View>
-            {errors.phone && (
-              <Text className="text-red-500 mt-1">{errors.phone}</Text>
-            )}
-
             <View className="relative">
-              <Mail
-                size={20}
-                color="#7f8c8d"
-                className="absolute left-4 top-4"
-              />
+              <Mail size={20} color="#7f8c8d" className="absolute left-4 top-4" />
               <TextInput
                 value={formData.email}
                 onChangeText={(value) => handleChange("email", value)}
-                placeholder="email@example.com"
-                className={`border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-lg p-4 pl-12 text-gray-800 bg-gray-50`}
+                placeholder="email@exemplo.com"
+                className="border border-gray-300 rounded-lg p-4 pl-12 bg-gray-50"
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
             </View>
-            {errors.email && (
-              <Text className="text-red-500 mt-1">{errors.email}</Text>
-            )}
           </View>
         </View>
 
-        {/* Submit Button */}
         <TouchableOpacity
           onPress={handleSubmit}
           disabled={isLoading}
-          className={`py-4 rounded-xl items-center justify-center ${isLoading ? "bg-blue-400" : "bg-blue-500"}`}
+          className={`py-4 rounded-xl items-center justify-center mb-10 ${isLoading ? "bg-blue-400" : "bg-blue-500"}`}
         >
-          <Text className="text-white text-lg font-semibold">
-            {isLoading ? "Registrando..." : "Registrar produtor"}
-          </Text>
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text className="text-white text-lg font-semibold">Registrar Produtor</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

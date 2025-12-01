@@ -1,35 +1,106 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Save, Phone, Mail, MapPin, User, FileText } from 'lucide-react-native';
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
+
 export default function DairyInformationScreen() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   
-  // Mock data for existing dairy information
   const [dairyData, setDairyData] = useState({
-    id: 'L001',
-    name: 'Fazenda Santa Clara',
-    cnpj: '12.345.678/0001-90',
-    phone: '(11) 98765-4321',
-    email: 'contato@santaclara.com.br',
-    address: 'Rodovia BR-381, Km 45 - São João Del Rei, MG',
-    responsible: 'Carlos Silva'
+    id: '', // ID do banco
+    dbId: null, // ID numérico real
+    name: '', // Razão Social
+    cnpj: '',
+    phone: '',
+    email: '', // Não persiste no back atual
+    address: '',
+    responsible: '', // Não persiste no back atual
+    regime: '' // Novo campo exigido pelo back
   });
   
-  // Form state
   const [formData, setFormData] = useState(dairyData);
-  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    fetchDairyInfo();
+  }, []);
+
+  const fetchDairyInfo = async () => {
+    setIsLoading(true);
+    try {
+        // Pega o primeiro laticínio cadastrado (assumindo ser o do usuário atual)
+        const response = await fetch(`${API_URL}/api/laticinios/`);
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+            const item = data[0];
+            const loadedData = {
+                id: `LAT-${item.id}`,
+                dbId: item.id,
+                name: item.razao_social,
+                cnpj: item.cnpj,
+                phone: item.telefone,
+                email: 'admin@leite.com', // Mock visual
+                address: item.endereco,
+                responsible: 'Administrador', // Mock visual
+                regime: item.regime_tributario
+            };
+            setDairyData(loadedData);
+            setFormData(loadedData);
+        }
+    } catch (error) {
+        console.log("Erro ao buscar laticínio:", error);
+    } finally {
+        setIsLoading(false);
+    }
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleSave = () => {
-    // In a real app, this would save to a database or API
-    setDairyData(formData);
-    setIsEditing(false);
-    Alert.alert('Sucesso', 'Informações salvas com sucesso!');
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+        const payload = {
+            razao_social: formData.name,
+            cnpj: formData.cnpj.replace(/\D/g, ""), // Limpa pontuação
+            telefone: formData.phone,
+            endereco: formData.address,
+            regime_tributario: formData.regime || "Simples Nacional",
+            inscricao_estadual: null 
+        };
+
+        let url = `${API_URL}/api/laticinios/`;
+        let method = 'POST';
+
+        if (formData.dbId) {
+            url += `${formData.dbId}/`;
+            method = 'PUT';
+        }
+
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            Alert.alert('Sucesso', 'Informações salvas com sucesso!');
+            fetchDairyInfo(); // Recarrega dados reais
+            setIsEditing(false);
+        } else {
+            const err = await response.json();
+            Alert.alert('Erro', 'Falha ao salvar: ' + JSON.stringify(err));
+        }
+    } catch (error) {
+        Alert.alert('Erro', 'Falha de conexão');
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -39,21 +110,19 @@ export default function DairyInformationScreen() {
 
   return (
     <View className="flex-1 bg-gray-50">
-      {/* Header */}
       <View className="bg-blue-600 pt-12 pb-6 px-4 shadow-md">
         <View className="flex-row items-center mb-4">
           <TouchableOpacity onPress={() => router.back()} className="mr-3">
             <ChevronLeft color="white" size={28} />
           </TouchableOpacity>
-          <Text className="text-white text-xl font-bold">Informações da Laticínio</Text>
+          <Text className="text-white text-xl font-bold">Informações do Laticínio</Text>
         </View>
-        <Text className="text-blue-100 text-sm">
-          Gerencie os dados cadastrais do laticínio
-        </Text>
+        <Text className="text-blue-100 text-sm">Gerencie os dados cadastrais</Text>
       </View>
 
       <ScrollView className="flex-1 px-4 py-6">
-        {/* Dairy Information Card */}
+        {isLoading && <ActivityIndicator size="large" color="#3498db" className="mb-4" />}
+        
         <View className="bg-white rounded-xl shadow-sm p-5 mb-6">
           <View className="flex-row items-center mb-4">
             <FileText color="#3498db" size={24} />
@@ -63,67 +132,39 @@ export default function DairyInformationScreen() {
           {!isEditing ? (
             <View>
               <View className="mb-4">
-                <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">ID</Text>
-                <Text className="text-gray-800 font-medium">{dairyData.id}</Text>
-              </View>
-              
-              <View className="mb-4">
-                <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">Nome Fantasia</Text>
-                <Text className="text-gray-800 font-medium">{dairyData.name}</Text>
+                <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">Razão Social</Text>
+                <Text className="text-gray-800 font-medium">{dairyData.name || "Não informado"}</Text>
               </View>
               
               <View className="mb-4">
                 <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">CNPJ</Text>
-                <Text className="text-gray-800 font-medium">{dairyData.cnpj}</Text>
+                <Text className="text-gray-800 font-medium">{dairyData.cnpj || "Não informado"}</Text>
               </View>
-              
-              <View className="mb-4">
-                <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">Responsável</Text>
-                <Text className="text-gray-800 font-medium">{dairyData.responsible}</Text>
-              </View>
-              
-              <View className="mb-4">
-                <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">Telefone</Text>
-                <View className="flex-row items-center mt-1">
-                  <Phone color="#7f8c8d" size={16} />
-                  <Text className="text-gray-800 font-medium ml-2">{dairyData.phone}</Text>
-                </View>
-              </View>
-              
-              <View className="mb-4">
-                <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">Email</Text>
-                <View className="flex-row items-center mt-1">
-                  <Mail color="#7f8c8d" size={16} />
-                  <Text className="text-gray-800 font-medium ml-2">{dairyData.email}</Text>
-                </View>
-              </View>
-              
+
               <View className="mb-4">
                 <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">Endereço</Text>
                 <View className="flex-row items-start mt-1">
                   <MapPin color="#7f8c8d" size={16} />
-                  <Text className="text-gray-800 font-medium ml-2 flex-1">{dairyData.address}</Text>
+                  <Text className="text-gray-800 font-medium ml-2 flex-1">{dairyData.address || "Não informado"}</Text>
+                </View>
+              </View>
+
+              <View className="mb-4">
+                <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">Telefone</Text>
+                <View className="flex-row items-center mt-1">
+                  <Phone color="#7f8c8d" size={16} />
+                  <Text className="text-gray-800 font-medium ml-2">{dairyData.phone || "Não informado"}</Text>
                 </View>
               </View>
             </View>
           ) : (
             <View>
               <View className="mb-4">
-                <Text className="text-gray-700 text-sm mb-2">ID</Text>
-                <TextInput
-                  className="border border-gray-300 rounded-lg px-4 py-3 bg-gray-50"
-                  value={formData.id}
-                  onChangeText={(value) => handleInputChange('id', value)}
-                  editable={false}
-                />
-              </View>
-              
-              <View className="mb-4">
-                <Text className="text-gray-700 text-sm mb-2">Nome Fantasia *</Text>
+                <Text className="text-gray-700 text-sm mb-2">Razão Social *</Text>
                 <TextInput
                   className="border border-gray-300 rounded-lg px-4 py-3 bg-white"
                   value={formData.name}
-                  onChangeText={(value) => handleInputChange('name', value)}
+                  onChangeText={(v) => handleInputChange('name', v)}
                 />
               </View>
               
@@ -132,17 +173,8 @@ export default function DairyInformationScreen() {
                 <TextInput
                   className="border border-gray-300 rounded-lg px-4 py-3 bg-white"
                   value={formData.cnpj}
-                  onChangeText={(value) => handleInputChange('cnpj', value)}
+                  onChangeText={(v) => handleInputChange('cnpj', v)}
                   keyboardType="numeric"
-                />
-              </View>
-              
-              <View className="mb-4">
-                <Text className="text-gray-700 text-sm mb-2">Responsável *</Text>
-                <TextInput
-                  className="border border-gray-300 rounded-lg px-4 py-3 bg-white"
-                  value={formData.responsible}
-                  onChangeText={(value) => handleInputChange('responsible', value)}
                 />
               </View>
               
@@ -151,18 +183,8 @@ export default function DairyInformationScreen() {
                 <TextInput
                   className="border border-gray-300 rounded-lg px-4 py-3 bg-white"
                   value={formData.phone}
-                  onChangeText={(value) => handleInputChange('phone', value)}
+                  onChangeText={(v) => handleInputChange('phone', v)}
                   keyboardType="phone-pad"
-                />
-              </View>
-              
-              <View className="mb-4">
-                <Text className="text-gray-700 text-sm mb-2">Email</Text>
-                <TextInput
-                  className="border border-gray-300 rounded-lg px-4 py-3 bg-white"
-                  value={formData.email}
-                  onChangeText={(value) => handleInputChange('email', value)}
-                  keyboardType="email-address"
                 />
               </View>
               
@@ -171,23 +193,31 @@ export default function DairyInformationScreen() {
                 <TextInput
                   className="border border-gray-300 rounded-lg px-4 py-3 bg-white"
                   value={formData.address}
-                  onChangeText={(value) => handleInputChange('address', value)}
+                  onChangeText={(v) => handleInputChange('address', v)}
                   multiline
-                  numberOfLines={3}
+                />
+              </View>
+
+               <View className="mb-4">
+                <Text className="text-gray-700 text-sm mb-2">Regime Tributário</Text>
+                <TextInput
+                  className="border border-gray-300 rounded-lg px-4 py-3 bg-white"
+                  value={formData.regime}
+                  placeholder="Ex: Simples Nacional"
+                  onChangeText={(v) => handleInputChange('regime', v)}
                 />
               </View>
             </View>
           )}
         </View>
 
-        {/* Action Buttons */}
         <View className="flex-row justify-between mt-2">
           {!isEditing ? (
             <TouchableOpacity 
               className="flex-1 bg-blue-600 py-4 rounded-xl items-center mr-2"
               onPress={() => setIsEditing(true)}
             >
-              <Text className="text-white font-bold text-base">Editar Informações</Text>
+              <Text className="text-white font-bold text-base">Editar / Cadastrar</Text>
             </TouchableOpacity>
           ) : (
             <>

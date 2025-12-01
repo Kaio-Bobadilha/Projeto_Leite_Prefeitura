@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import LoteColeta, NaoConformidade
 from django.contrib.contenttypes.models import ContentType
-from .models import LoteColeta, NaoConformidade, AnaliseFisicoQuimica
+from .models import LoteColeta, NaoConformidade, AnaliseFisicoQuimica, ControlePasteurizacao, ControleAntibiotico, ResumoAdulterantes
 
 class LoteColetaSerializer(serializers.ModelSerializer):
     produtor = serializers.StringRelatedField()
@@ -70,4 +70,19 @@ class RegistrarNCSerializer(serializers.ModelSerializer):
 class AnaliseFisicoQuimicaSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnaliseFisicoQuimica
+        fields = '__all__'
+
+class ControlePasteurizacaoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ControlePasteurizacao
+        fields = '__all__'
+
+class ControleAntibioticoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ControleAntibiotico
+        fields = '__all__'
+
+class ResumoAdulterantesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ResumoAdulterantes
         fields = '__all__'

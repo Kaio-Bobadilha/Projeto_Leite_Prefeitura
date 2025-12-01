@@ -70,3 +70,56 @@ class AnaliseFisicoQuimica(models.Model):
 
     def __str__(self):
         return f"Análise {self.id} - {self.data_hora}"
+    
+    # --- Adicione isto ao final do arquivo v2/back/coleta/models.py ---
+
+class ControlePasteurizacao(models.Model):
+    STATUS_CHOICES = [
+        ('compliant', 'Regular'),
+        ('non-compliant', 'Irregular'),
+    ]
+
+    data = models.DateField(verbose_name="Data")
+    hora = models.TimeField(verbose_name="Hora")
+    teste_fosfatase = models.CharField(max_length=100, verbose_name="Teste de Fosfatase")
+    teste_peroxidase = models.CharField(max_length=100, verbose_name="Teste de Peroxidase")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, verbose_name="Status")
+    responsavel = models.CharField(max_length=200, verbose_name="Pessoa Responsável")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Pasteurização {self.data} - {self.status}"
+
+
+class ControleAntibiotico(models.Model):
+    STATUS_CHOICES = [
+        ('compliant', 'Regular'),
+        ('non-compliant', 'Irregular'),
+    ]
+
+    data = models.DateField(verbose_name="Data")
+    hora = models.TimeField(verbose_name="Hora")
+    classe = models.CharField(max_length=100, verbose_name="Classe")
+    resultado = models.CharField(max_length=200, verbose_name="Resultado")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, verbose_name="Status")
+    responsavel = models.CharField(max_length=200, verbose_name="Pessoa Responsável")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Antibiótico {self.data} - {self.classe}"
+
+
+class ResumoAdulterantes(models.Model):
+    data_hora = models.DateTimeField(verbose_name="Data e Hora")
+    codigo_produtor = models.CharField(max_length=50, verbose_name="Código Produtor")
+    nome_produtor = models.CharField(max_length=200, verbose_name="Nome Produtor")
+    adulterantes = models.TextField(verbose_name="Adulterantes")
+    padroes_fisico_quimicos = models.TextField(verbose_name="Padrões Físico-Químicos")
+    analista = models.CharField(max_length=200, verbose_name="Analista Responsável")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Adulterantes - {self.nome_produtor} - {self.data_hora}"

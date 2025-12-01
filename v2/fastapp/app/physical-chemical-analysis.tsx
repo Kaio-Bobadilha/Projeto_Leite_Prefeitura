@@ -10,6 +10,8 @@ import {
 import { useRouter } from "expo-router";
 import { ChevronLeft, Save } from "lucide-react-native";
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
+
 export default function PhysicalChemicalAnalysisScreen() {
   const router = useRouter();
 
@@ -114,19 +116,58 @@ export default function PhysicalChemicalAnalysisScreen() {
   };
 
   // Handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
-      // In a real app, this would send data to a backend
-      console.log("Form submitted:", formData);
-      Alert.alert(
-        "Success",
-        "Physical-Chemical Analysis Report saved successfully!",
-        [{ text: "OK", onPress: () => router.back() }]
-      );
+      try {
+        // 1. Converter data de "DD/MM/YYYY HH:MM" para ISO "YYYY-MM-DDTHH:MM:SS"
+        const [datePart, timePart] = formData.dateTime.split(' ');
+        const [day, month, year] = datePart.split('/');
+        const isoDateTime = `${year}-${month}-${day}T${timePart}:00`;
+
+        // 2. Mapear campos do Frontend (Inglês) para o Backend (Português)
+        const payload = {
+          data_hora: isoDateTime,
+          temperatura: parseFloat(formData.temperature),
+          ph: parseFloat(formData.ph),
+          acidez: parseFloat(formData.acidity),
+          densidade: parseFloat(formData.density),
+          crioscopia: parseFloat(formData.cryoscopy),
+          gordura: parseFloat(formData.fat),
+          proteina: parseFloat(formData.protein),
+          esd: parseFloat(formData.esd),
+          est: parseFloat(formData.est),
+          lactose: parseFloat(formData.lactose),
+          antibioticos: formData.antibiotics, // Backend: antibioticos
+          conservantes: formData.preservatives, // Backend: conservantes
+          analista: formData.analyst // Backend: analista
+        };
+
+        // 3. Enviar para a API
+        const response = await fetch(`${API_URL}/api/analises-fisico-quimicas/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (response.ok) {
+          Alert.alert(
+            "Sucesso",
+            "Relatório de Análise Físico-Química salvo com sucesso!",
+            [{ text: "OK", onPress: () => router.back() }]
+          );
+        } else {
+          const errorData = await response.json();
+          Alert.alert("Erro", "Falha ao salvar: " + JSON.stringify(errorData));
+        }
+      } catch (error) {
+        Alert.alert("Erro", "Erro de conexão: " + error.message);
+      }
     } else {
       Alert.alert(
-        "Validation Error",
-        "Please fix the highlighted errors before submitting."
+        "Erro de Validação",
+        "Por favor, corrija os erros destacados antes de enviar."
       );
     }
   };

@@ -1,6 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Modal, Alert, ScrollView } from 'react-native';
-import { Plus, Edit2, Trash2, X } from 'lucide-react-native';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  Modal,
+  Alert,
+  ScrollView,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { Plus, Edit2, Trash2, X, ChevronLeft } from "lucide-react-native";
 
 interface Collector {
   id: string;
@@ -11,13 +21,16 @@ interface Collector {
 }
 
 export default function CollectorManagementScreen() {
+  const router = useRouter();
   const [collectors, setCollectors] = useState<Collector[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentCollector, setCurrentCollector] = useState<Collector | null>(null);
-  const [driverName, setDriverName] = useState('');
-  const [licensePlate, setLicensePlate] = useState('');
-  const [vehicleModel, setVehicleModel] = useState('');
-  const [contactInfo, setContactInfo] = useState('');
+  const [currentCollector, setCurrentCollector] = useState<Collector | null>(
+    null
+  );
+  const [driverName, setDriverName] = useState("");
+  const [licensePlate, setLicensePlate] = useState("");
+  const [vehicleModel, setVehicleModel] = useState("");
+  const [contactInfo, setContactInfo] = useState("");
 
   // Load mock data on component mount
   useEffect(() => {
@@ -27,35 +40,35 @@ export default function CollectorManagementScreen() {
   const loadMockData = () => {
     const mockCollectors: Collector[] = [
       {
-        id: '1',
-        driverName: 'Carlos Silva',
-        licensePlate: 'ABC-1234',
-        vehicleModel: 'Mercedes-Benz Sprinter',
-        contactInfo: '(11) 98765-4321'
+        id: "1",
+        driverName: "Carlos Silva",
+        licensePlate: "ABC-1234",
+        vehicleModel: "Mercedes-Benz Sprinter",
+        contactInfo: "(11) 98765-4321",
       },
       {
-        id: '2',
-        driverName: 'Roberto Santos',
-        licensePlate: 'XYZ-5678',
-        vehicleModel: 'Volkswagen Delivery',
-        contactInfo: '(21) 91234-5678'
+        id: "2",
+        driverName: "Roberto Santos",
+        licensePlate: "XYZ-5678",
+        vehicleModel: "Volkswagen Delivery",
+        contactInfo: "(21) 91234-5678",
       },
       {
-        id: '3',
-        driverName: 'Mariana Costa',
-        licensePlate: 'DEF-9012',
-        vehicleModel: 'Ford Transit',
-        contactInfo: '(31) 99876-5432'
-      }
+        id: "3",
+        driverName: "Mariana Costa",
+        licensePlate: "DEF-9012",
+        vehicleModel: "Ford Transit",
+        contactInfo: "(31) 99876-5432",
+      },
     ];
     setCollectors(mockCollectors);
   };
 
   const resetForm = () => {
-    setDriverName('');
-    setLicensePlate('');
-    setVehicleModel('');
-    setContactInfo('');
+    setDriverName("");
+    setLicensePlate("");
+    setVehicleModel("");
+    setContactInfo("");
     setCurrentCollector(null);
   };
 
@@ -80,15 +93,21 @@ export default function CollectorManagementScreen() {
 
   const saveCollector = () => {
     if (!driverName || !licensePlate || !vehicleModel || !contactInfo) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+      Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
       return;
     }
 
     if (currentCollector) {
       // Edit existing collector
-      const updatedCollectors = collectors.map(collector => 
-        collector.id === currentCollector.id 
-          ? { ...collector, driverName, licensePlate, vehicleModel, contactInfo } 
+      const updatedCollectors = collectors.map((collector) =>
+        collector.id === currentCollector.id
+          ? {
+              ...collector,
+              driverName,
+              licensePlate,
+              vehicleModel,
+              contactInfo,
+            }
           : collector
       );
       setCollectors(updatedCollectors);
@@ -99,7 +118,7 @@ export default function CollectorManagementScreen() {
         driverName,
         licensePlate,
         vehicleModel,
-        contactInfo
+        contactInfo,
       };
       setCollectors([...collectors, newCollector]);
     }
@@ -109,18 +128,20 @@ export default function CollectorManagementScreen() {
 
   const deleteCollector = (id: string) => {
     Alert.alert(
-      'Confirmar Exclusão',
-      'Tem certeza que deseja excluir este coletor?',
+      "Confirmar Exclusão",
+      "Tem certeza que deseja excluir este coletor?",
       [
-        { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Excluir', 
-          style: 'destructive',
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
           onPress: () => {
-            const updatedCollectors = collectors.filter(collector => collector.id !== id);
+            const updatedCollectors = collectors.filter(
+              (collector) => collector.id !== id
+            );
             setCollectors(updatedCollectors);
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -129,19 +150,21 @@ export default function CollectorManagementScreen() {
     <View className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100">
       <View className="flex-row justify-between items-start">
         <View className="flex-1">
-          <Text className="text-lg font-bold text-gray-800">{item.driverName}</Text>
+          <Text className="text-lg font-bold text-gray-800">
+            {item.driverName}
+          </Text>
           <Text className="text-gray-600 mt-1">Placa: {item.licensePlate}</Text>
           <Text className="text-gray-600">Veículo: {item.vehicleModel}</Text>
           <Text className="text-blue-600 mt-1">{item.contactInfo}</Text>
         </View>
         <View className="flex-row">
-          <TouchableOpacity 
+          <TouchableOpacity
             className="p-2 mr-2"
             onPress={() => openEditModal(item)}
           >
             <Edit2 size={20} color="#3498db" />
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             className="p-2"
             onPress={() => deleteCollector(item.id)}
           >
@@ -156,19 +179,33 @@ export default function CollectorManagementScreen() {
     <View className="flex-1 bg-gray-50">
       {/* Header */}
       <View className="bg-white p-4 shadow-sm">
-        <Text className="text-2xl font-bold text-gray-800">Gerenciamento de Coletores</Text>
-        <Text className="text-gray-600 mt-1">Lista e gerencia os coletores de leite</Text>
+        <View className="flex-row items-center mb-2">
+          <TouchableOpacity
+            onPress={() => router.push("/")}
+            className="mr-3 p-2 rounded-full bg-blue-50"
+          >
+            <ChevronLeft size={24} color="#3498db" />
+          </TouchableOpacity>
+          <Text className="text-2xl font-bold text-gray-800">
+            Gerenciamento de Coletores
+          </Text>
+        </View>
+        <Text className="text-gray-600 mt-1 ml-12">
+          Lista e gerencia os coletores de leite
+        </Text>
       </View>
 
       {/* Main Content */}
       <View className="flex-1 p-4">
         {/* Add Button */}
-        <TouchableOpacity 
+        <TouchableOpacity
           className="flex-row items-center justify-center bg-blue-500 py-3 rounded-lg mb-4"
           onPress={openAddModal}
         >
           <Plus size={20} color="white" />
-          <Text className="text-white font-semibold ml-2">Adicionar Coletor</Text>
+          <Text className="text-white font-semibold ml-2">
+            Adicionar Coletor
+          </Text>
         </TouchableOpacity>
 
         {/* Collectors List */}
@@ -179,8 +216,12 @@ export default function CollectorManagementScreen() {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View className="items-center justify-center py-10">
-              <Text className="text-gray-500 text-lg">Nenhum coletor cadastrado</Text>
-              <Text className="text-gray-400 mt-2">Toque em "Adicionar Coletor" para começar</Text>
+              <Text className="text-gray-500 text-lg">
+                Nenhum coletor cadastrado
+              </Text>
+              <Text className="text-gray-400 mt-2">
+                Toque em "Adicionar Coletor" para começar
+              </Text>
             </View>
           }
         />
@@ -196,7 +237,7 @@ export default function CollectorManagementScreen() {
           {/* Modal Header */}
           <View className="bg-white p-4 flex-row justify-between items-center shadow-sm">
             <Text className="text-xl font-bold text-gray-800">
-              {currentCollector ? 'Editar Coletor' : 'Novo Coletor'}
+              {currentCollector ? "Editar Coletor" : "Novo Coletor"}
             </Text>
             <TouchableOpacity onPress={closeModal}>
               <X size={24} color="#95a5a6" />
@@ -206,7 +247,9 @@ export default function CollectorManagementScreen() {
           {/* Form */}
           <ScrollView className="flex-1 p-4">
             <View className="bg-white rounded-lg p-4 mb-4">
-              <Text className="text-gray-700 font-medium mb-2">Nome do Motorista *</Text>
+              <Text className="text-gray-700 font-medium mb-2">
+                Nome do Motorista *
+              </Text>
               <TextInput
                 className="border border-gray-300 rounded-lg p-3 mb-4"
                 placeholder="Digite o nome completo"
@@ -214,7 +257,9 @@ export default function CollectorManagementScreen() {
                 onChangeText={setDriverName}
               />
 
-              <Text className="text-gray-700 font-medium mb-2">Placa do Veículo *</Text>
+              <Text className="text-gray-700 font-medium mb-2">
+                Placa do Veículo *
+              </Text>
               <TextInput
                 className="border border-gray-300 rounded-lg p-3 mb-4"
                 placeholder="Ex: ABC-1234"
@@ -222,7 +267,9 @@ export default function CollectorManagementScreen() {
                 onChangeText={setLicensePlate}
               />
 
-              <Text className="text-gray-700 font-medium mb-2">Modelo do Veículo *</Text>
+              <Text className="text-gray-700 font-medium mb-2">
+                Modelo do Veículo *
+              </Text>
               <TextInput
                 className="border border-gray-300 rounded-lg p-3 mb-4"
                 placeholder="Ex: Mercedes-Benz Sprinter"
@@ -239,20 +286,22 @@ export default function CollectorManagementScreen() {
               />
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               className="bg-blue-500 py-3 rounded-lg mb-4"
               onPress={saveCollector}
             >
               <Text className="text-white font-semibold text-center">
-                {currentCollector ? 'Atualizar Coletor' : 'Adicionar Coletor'}
+                {currentCollector ? "Atualizar Coletor" : "Adicionar Coletor"}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               className="bg-gray-200 py-3 rounded-lg"
               onPress={closeModal}
             >
-              <Text className="text-gray-700 font-semibold text-center">Cancelar</Text>
+              <Text className="text-gray-700 font-semibold text-center">
+                Cancelar
+              </Text>
             </TouchableOpacity>
           </ScrollView>
         </View>

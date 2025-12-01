@@ -107,7 +107,7 @@ export default function InitialCollectionReportScreen() {
               <ChevronLeft color="white" size={24} />
             </TouchableOpacity>
             <Text className="text-white text-xl font-bold">
-              Initial Collection Report
+              Relatório de coleta inicial
             </Text>
           </View>
           <Text className="text-blue-100 text-sm ml-12">
@@ -117,7 +117,7 @@ export default function InitialCollectionReportScreen() {
 
         {/* Form Content */}
         <ScrollView className="flex-1 px-4 py-6">
-          {/* Date and Time Section */}
+          {/* Data e Hora Section */}
           <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <Text className="text-gray-700 font-bold mb-3 flex flex-row items-center">
               <Calendar color="#3498db" size={20} className="mr-2" />
@@ -126,7 +126,7 @@ export default function InitialCollectionReportScreen() {
 
             <View className="flex-row gap-4">
               <View className="flex-1">
-                <Text className="text-gray-600 text-sm mb-1">Date</Text>
+                <Text className="text-gray-600 text-sm mb-1">Data</Text>
                 <TextInput
                   value={formData.date}
                   onChangeText={(value) => handleChange("date", value)}
@@ -141,7 +141,7 @@ export default function InitialCollectionReportScreen() {
               </View>
 
               <View className="flex-1">
-                <Text className="text-gray-600 text-sm mb-1">Time</Text>
+                <Text className="text-gray-600 text-sm mb-1">Hora</Text>
                 <TextInput
                   value={formData.time}
                   onChangeText={(value) => handleChange("time", value)}
@@ -160,15 +160,17 @@ export default function InitialCollectionReportScreen() {
           {/* Tank Information */}
           <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <Text className="text-gray-700 font-bold mb-3">
-              Tank Information
+              Informações do Tanque
             </Text>
 
             <View className="mb-3">
-              <Text className="text-gray-600 text-sm mb-1">Tank Number</Text>
+              <Text className="text-gray-600 text-sm mb-1">
+                Número do Tanque
+              </Text>
               <TextInput
                 value={formData.tankNumber}
                 onChangeText={(value) => handleChange("tankNumber", value)}
-                placeholder="Enter tank number"
+                placeholder="Insira o número do tanque"
                 className={`border rounded-lg p-3 ${errors.tankNumber ? "border-red-500" : "border-gray-300"}`}
               />
               {errors.tankNumber ? (
@@ -182,15 +184,17 @@ export default function InitialCollectionReportScreen() {
           {/* Producer Information */}
           <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <Text className="text-gray-700 font-bold mb-3">
-              Producer Information
+              Informações do produtor
             </Text>
 
             <View className="mb-3">
-              <Text className="text-gray-600 text-sm mb-1">Producer Code</Text>
+              <Text className="text-gray-600 text-sm mb-1">
+                Código do Produtor
+              </Text>
               <TextInput
                 value={formData.producerCode}
                 onChangeText={(value) => handleChange("producerCode", value)}
-                placeholder="Enter producer code"
+                placeholder="Insira o Código do Produtor"
                 className={`border rounded-lg p-3 ${errors.producerCode ? "border-red-500" : "border-gray-300"}`}
               />
               {errors.producerCode ? (
@@ -201,11 +205,13 @@ export default function InitialCollectionReportScreen() {
             </View>
 
             <View className="mb-3">
-              <Text className="text-gray-600 text-sm mb-1">Producer Name</Text>
+              <Text className="text-gray-600 text-sm mb-1">
+                Nome do Produtor
+              </Text>
               <TextInput
                 value={formData.producerName}
                 onChangeText={(value) => handleChange("producerName", value)}
-                placeholder="Enter producer name"
+                placeholder="Insira o código do Produtor"
                 className={`border rounded-lg p-3 ${errors.producerName ? "border-red-500" : "border-gray-300"}`}
               />
               {errors.producerName ? (
@@ -220,17 +226,17 @@ export default function InitialCollectionReportScreen() {
           <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <Text className="text-gray-700 font-bold mb-3 flex flex-row items-center">
               <Thermometer color="#3498db" size={20} className="mr-2" />
-              Temperature
+              Temperatura
             </Text>
 
             <View>
               <Text className="text-gray-600 text-sm mb-1">
-                Temperature (°C)
+                Temperatura (°C)
               </Text>
               <TextInput
                 value={formData.temperature}
                 onChangeText={(value) => handleChange("temperature", value)}
-                placeholder="Enter temperature"
+                placeholder="Insira a temperatura"
                 keyboardType="numeric"
                 className={`border rounded-lg p-3 ${errors.temperature ? "border-red-500" : "border-gray-300"}`}
               />
@@ -246,15 +252,15 @@ export default function InitialCollectionReportScreen() {
           <View className="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <Text className="text-gray-700 font-bold mb-3 flex flex-row items-center">
               <TestTube color="#3498db" size={20} className="mr-2" />
-              Alizarol Test
+              Teste Alizraol
             </Text>
 
             <View>
-              <Text className="text-gray-600 text-sm mb-1">Result</Text>
+              <Text className="text-gray-600 text-sm mb-1">Resultado</Text>
               <TextInput
                 value={formData.alizarolTest}
                 onChangeText={(value) => handleChange("alizarolTest", value)}
-                placeholder="Enter test result"
+                placeholder="Insira o teste do resultado"
                 className={`border rounded-lg p-3 ${errors.alizarolTest ? "border-red-500" : "border-gray-300"}`}
               />
               {errors.alizarolTest ? (
@@ -269,17 +275,17 @@ export default function InitialCollectionReportScreen() {
           <View className="bg-white rounded-xl p-4 mb-6 shadow-sm">
             <Text className="text-gray-700 font-bold mb-3 flex flex-row items-center">
               <User color="#3498db" size={20} className="mr-2" />
-              Responsible Person
+              Pessoa Responsável
             </Text>
 
             <View>
-              <Text className="text-gray-600 text-sm mb-1">Name</Text>
+              <Text className="text-gray-600 text-sm mb-1">Nome</Text>
               <TextInput
                 value={formData.responsiblePerson}
                 onChangeText={(value) =>
                   handleChange("responsiblePerson", value)
                 }
-                placeholder="Enter responsible person name"
+                placeholder="Insira o nome do responsável"
                 className={`border rounded-lg p-3 ${errors.responsiblePerson ? "border-red-500" : "border-gray-300"}`}
               />
               {errors.responsiblePerson ? (
@@ -298,7 +304,9 @@ export default function InitialCollectionReportScreen() {
             className="bg-green-500 rounded-xl py-4 flex-row items-center justify-center shadow-md"
           >
             <Save color="white" size={20} className="mr-2" />
-            <Text className="text-white font-bold text-lg">Save Report</Text>
+            <Text className="text-white font-bold text-lg">
+              Salvar Relatório
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

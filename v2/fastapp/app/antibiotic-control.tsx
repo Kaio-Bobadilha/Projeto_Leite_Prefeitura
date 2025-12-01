@@ -48,22 +48,22 @@ export default function AntibioticControlScreen() {
     };
 
     if (!classValue.trim()) {
-      newErrors.classValue = "Class is required";
+      newErrors.classValue = "Classe é obrigatória";
       isValid = false;
     }
 
     if (!result.trim()) {
-      newErrors.result = "Result is required";
+      newErrors.result = "Resultado é obrigatório";
       isValid = false;
     }
 
     if (!status) {
-      newErrors.status = "Status is required";
+      newErrors.status = "Estatus é obrigatório";
       isValid = false;
     }
 
     if (!responsiblePerson.trim()) {
-      newErrors.responsiblePerson = "Responsible person is required";
+      newErrors.responsiblePerson = "Pessoa responsável é obrigatória";
       isValid = false;
     }
 
@@ -88,8 +88,8 @@ export default function AntibioticControlScreen() {
 
       // Show success message
       Alert.alert(
-        "Report Submitted",
-        "Antibiotic control report has been successfully submitted.",
+        "Relatório Enviado",
+        "O relatório de controle de antibióticos foi enviado com sucesso.",
         [{ text: "OK", onPress: () => router.back() }]
       );
     }
@@ -125,25 +125,27 @@ export default function AntibioticControlScreen() {
             <ChevronLeft color="white" size={24} />
           </TouchableOpacity>
           <Text className="text-white text-xl font-bold">
-            Antibiotic Control Report
+            Relatório de Controle de Antibióticos
           </Text>
         </View>
-        <Text className="text-blue-100 ml-12">Relatório 3</Text>
+        <Text className="text-blue-100 ml-12">
+          Preencha os dados do relatório
+        </Text>
       </View>
 
       {/* Form */}
       <ScrollView className="flex-1 px-4 py-6">
         <View className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <Text className="text-lg font-semibold text-gray-800 mb-2">
-            Sample Information
+            Dados da Amostra
           </Text>
           <Text className="text-gray-500 mb-6">
-            Enter details for antibiotic control analysis
+            Insira os detalhes para controle e análise de antibióticos
           </Text>
 
           {/* Date Field */}
           <View className="mb-6">
-            <Text className="text-gray-700 font-medium mb-2">Date</Text>
+            <Text className="text-gray-700 font-medium mb-2">Data</Text>
             <View
               className={`flex-row items-center border ${errors.classValue ? "border-red-500" : "border-gray-300"} rounded-lg p-4 bg-white`}
             >
@@ -154,7 +156,7 @@ export default function AntibioticControlScreen() {
 
           {/* Time Field */}
           <View className="mb-6">
-            <Text className="text-gray-700 font-medium mb-2">Time</Text>
+            <Text className="text-gray-700 font-medium mb-2">Horário</Text>
             <View
               className={`flex-row items-center border ${errors.classValue ? "border-red-500" : "border-gray-300"} rounded-lg p-4 bg-white`}
             >
@@ -165,7 +167,7 @@ export default function AntibioticControlScreen() {
 
           {/* Class Field */}
           <View className="mb-6">
-            <Text className="text-gray-700 font-medium mb-2">Class</Text>
+            <Text className="text-gray-700 font-medium mb-2">Classe</Text>
             <TextInput
               value={classValue}
               onChangeText={(text) => {
@@ -174,7 +176,7 @@ export default function AntibioticControlScreen() {
                   setErrors({ ...errors, classValue: "" });
                 }
               }}
-              placeholder="Enter sample class"
+              placeholder="Insira a classe da amostra"
               className={`border ${errors.classValue ? "border-red-500" : "border-gray-300"} rounded-lg p-4 bg-white`}
             />
             {errors.classValue ? (
@@ -184,7 +186,7 @@ export default function AntibioticControlScreen() {
 
           {/* Result Field */}
           <View className="mb-6">
-            <Text className="text-gray-700 font-medium mb-2">Result</Text>
+            <Text className="text-gray-700 font-medium mb-2">Resultado</Text>
             <TextInput
               value={result}
               onChangeText={(text) => {
@@ -193,7 +195,7 @@ export default function AntibioticControlScreen() {
                   setErrors({ ...errors, result: "" });
                 }
               }}
-              placeholder="Enter test result"
+              placeholder="Insira o resultado do teste"
               className={`border ${errors.result ? "border-red-500" : "border-gray-300"} rounded-lg p-4 bg-white`}
             />
             {errors.result ? (
@@ -203,7 +205,7 @@ export default function AntibioticControlScreen() {
 
           {/* Status Selection */}
           <View className="mb-6">
-            <Text className="text-gray-700 font-medium mb-2">Status</Text>
+            <Text className="text-gray-700 font-medium mb-2">Estatus</Text>
             <View className="flex-row justify-between">
               <TouchableOpacity
                 onPress={() => {
@@ -230,7 +232,7 @@ export default function AntibioticControlScreen() {
                       : "text-gray-500"
                   }
                 >
-                  Compliant
+                  Regular
                 </Text>
               </TouchableOpacity>
 
@@ -259,7 +261,7 @@ export default function AntibioticControlScreen() {
                       : "text-gray-500"
                   }
                 >
-                  Non-Compliant
+                  Irregular
                 </Text>
               </TouchableOpacity>
             </View>
@@ -271,7 +273,7 @@ export default function AntibioticControlScreen() {
           {/* Responsible Person Field */}
           <View className="mb-2">
             <Text className="text-gray-700 font-medium mb-2">
-              Responsible Person
+              Pessoa Reponsável
             </Text>
             <TextInput
               value={responsiblePerson}
@@ -281,7 +283,7 @@ export default function AntibioticControlScreen() {
                   setErrors({ ...errors, responsiblePerson: "" });
                 }
               }}
-              placeholder="Enter name of responsible person"
+              placeholder="Insira o nome da pessoa responsável"
               className={`border ${errors.responsiblePerson ? "border-red-500" : "border-gray-300"} rounded-lg p-4 bg-white`}
             />
             {errors.responsiblePerson ? (
@@ -295,10 +297,10 @@ export default function AntibioticControlScreen() {
         {/* Submit Button */}
         <TouchableOpacity
           onPress={handleSubmit}
-          className="bg-blue-600 py-4 rounded-xl shadow-md mb-6"
+          className="bg-green-600 py-4 rounded-xl shadow-md mb-6"
         >
           <Text className="text-white text-center font-bold text-lg">
-            Submit Report
+            Salvar Relatório
           </Text>
         </TouchableOpacity>
       </ScrollView>
